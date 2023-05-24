@@ -24,4 +24,26 @@ export class User {
             }
         })
     }
+
+    public static SignUpUser = async (name, forname, birthdate, telephone, email, password) =>
+    {
+        let connection = Connection.getConnection();
+        let query = `insert into users(name, forname, birthdate, telephone, email, idrole, password) values ('${name}', '${forname}', '${birthdate}', '${telephone}', '${email}', 1, md5('${password}'))`;
+
+        let [results, metadata] :any = null;
+        try
+        { 
+            [results, metadata] = await connection.query(query);
+        } 
+        catch (e)
+        {
+            console.log("Exception sur signup user " + e);
+            throw e;
+        }
+        console.log(results);
+
+    }
+
+
+
 }

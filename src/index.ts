@@ -2,6 +2,8 @@ import { Server } from "socket.io"
 import http from "http"
 import express from "express"
 import auth from "./routes/auth"
+import signup from "./routes/signup"
+
 require("dotenv").config()
 
 const app = express()
@@ -12,6 +14,8 @@ app.get("/", (req, res) => {
     res.json({"message": "Hello world"})
 })
 app.use('/auth', auth)
+
+app.use('/user/', signup);
 
 io.on("connection", (socket) => {
     console.log("User connected on socket")
