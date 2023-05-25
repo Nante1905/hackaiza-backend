@@ -2,7 +2,7 @@ import { Server } from "socket.io"
 import http from "http"
 import express from "express"
 import auth from "./routes/auth"
-import signup from "./routes/signup"
+import user from "./routes/user"
 
 require("dotenv").config()
 
@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
 })
 app.use('/auth', auth)
 
-app.use('/user/', signup);
+app.use('/user', user);
 
 io.on("connection", (socket) => {
     console.log("User connected on socket")
