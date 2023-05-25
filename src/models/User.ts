@@ -1,7 +1,10 @@
 import { Connection } from "../connection/Connection"
+import Driver from "./Driver"
 
 export class User {
-    constructor(private username :string, private password: string) {
+    public username :string
+    public password: string
+    constructor() {
         
     }
 
@@ -14,14 +17,12 @@ export class User {
 
         let user :User = null
         if(results.length != 0) {
-            user = new User(results[0].username, results[0].password)
+            user = new User()
+            user.username = results[0].username
+            user.password = results[0].password
         }
 
 
-        return new Promise((resolve, reject) => {
-            if(user != null) {
-                resolve(user)
-            }
-        })
+        return user
     }
 }

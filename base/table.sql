@@ -78,7 +78,6 @@ CREATE TABLE Driver(
     idBrand int,
     isAvalable BOOLEAN,
     estimatePrice DOUBLE PRECISION,
-    driverCol VARCHAR(45),
     FOREIGN KEY (idDriver) REFERENCES Users (idUser),
     FOREIGN KEY (idBrand) REFERENCES Brand (idBrand)
 );
@@ -107,3 +106,8 @@ INSERT INTO roles VALUES(DEFAULT, 'Client');
 INSERT INTO roles VALUES(DEFAULT, 'Chauffeur');
 
 INSERT INTO users VALUES(DEFAULT, 'Rabe', 'RANDRIAMAMONJY', '12-05-1996', '0348712356', 'rabe@gmail.com', 1, 'azerty');
+INSERT INTO users VALUES(DEFAULT, 'Jean', 'RAKOTO', '12-05-1996', '0340100001', 'jean@gmail.com', 2, 'jean');
+INSERT INTO users VALUES(DEFAULT, 'Jeane', 'RAKOTO', '12-05-1996', '0340100001', 'jeane@gmail.com', 2, 'jeane');
+
+insert into driver values (2, '1111 TBA', null, true, 3000)
+insert into driver values (3, '1112 TBA', null, true, 3500)
