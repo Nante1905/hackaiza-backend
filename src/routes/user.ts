@@ -3,14 +3,14 @@ import { User } from "./../models/User"
 
 const user = express.Router()
 
-user.get('/signupclient/:name/:forname/:birthdate/:telephone/:email/:password', async (req, res) =>
+user.get('/signupclient', async (req, res) =>
 {
-    const name = req.params.name;
-    const forname = req.params.forname;
-    const birthdate = req.params.birthdate;
-    const telephone = req.params.telephone;
-    const email = req.params.email;
-    const password = req.params.password;
+    const name = req.body.name;
+    const forname = req.body.forname;
+    const birthdate = req.body.birthdate;
+    const telephone = req.body.telephone;
+    const email = req.body.email;
+    const password = req.body.password;
 
     try
     {
@@ -29,17 +29,17 @@ user.get('/signupclient/:name/:forname/:birthdate/:telephone/:email/:password', 
     }
 })
 
-user.get('/signupdriver/:name/:forname/:birthdate/:telephone/:email/:password/:registration/:idbrand/:estimationPrice', async (req, res) =>
+user.get('/signupdriver', async (req, res) =>
 {
-    const name = req.params.name;
-    const forname = req.params.forname;
-    const birthdate = req.params.birthdate;
-    const telephone = req.params.telephone;
-    const email = req.params.email;
-    const password = req.params.password;
-    const registration = req.params.registration;
-    const idbrand = req.params.idbrand;
-    const estimationPrice = req.params.estimationPrice;
+    const name = req.body.name;
+    const forname = req.body.forname;
+    const birthdate = req.body.birthdate;
+    const telephone = req.body.telephone;
+    const email = req.body.email;
+    const password = req.body.password;
+    const registration = req.body.registration;
+    const idbrand = req.body.idbrand;
+    const estimationPrice = req.body.estimationPrice;
 
     try
     {
