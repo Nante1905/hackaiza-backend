@@ -31,10 +31,17 @@ export class UserAfa {
                 socket.emit('joinRoom', roomName);
             });
         }
+        else {
+            throw new Error("Identifient of user not found");
+        }
 
         return new Promise((resolve, reject) => {
             if(user != null) {
                 resolve(user)
+            }
+            else {
+                const error = new Error("Identifient of user not found");
+                reject(error);
             }
         })
     }

@@ -5,7 +5,7 @@ import { UserAfa } from "../models/UserAfa"
 const authentification = express.Router()
 authentification.get('/', (req, res) => {
 
-    UserAfa.checkUser('Rabe', 'rabe@gmail.com').then((user :UserAfa) => {
+    UserAfa.checkUser('Rabe1', 'rabe@gmail.com').then((user :UserAfa) => {
         
         if(user != null) {
             Role.selectRole(user.idRole).then((role :Role) => {
@@ -20,7 +20,12 @@ authentification.get('/', (req, res) => {
                 "message": "error"
             })
         }
-    }).catch((error) => {})
+    }).catch((error) => {
+        // console.log(error.message);
+        res.json({
+            "message_erreur": error.message
+        })
+    })
 })
 
 

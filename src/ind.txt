@@ -1,6 +1,0 @@
-je voudrais lister touts les clients connecte a socket un serveur en js en utilisant l'
-extension typescipt 
-l'etape suivie sera la suivante, on va faire joindre tout les socket client dans un room
-puis les lister dans un serveur
-je ne voudrais pas utiliser un naigateur 
-donnez moi l'etape detaille avec les installations reauises
