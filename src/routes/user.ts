@@ -25,7 +25,6 @@ user.get('/signupclient', async (req, res) =>
         res.json({
             "message" : "Inscription failed"
         })
-        res.redirect('/inscription')
     }
 })
 
@@ -55,7 +54,6 @@ user.get('/signupdriver', async (req, res) =>
         res.json({
             "message" : "Inscription failed"
         })
-        res.redirect('/inscription')
     }
 })
 export default user
