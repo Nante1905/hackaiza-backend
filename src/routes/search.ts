@@ -1,9 +1,10 @@
 import express from "express"
 import { io } from ".."
-import CustomWebSocket from "../models/CustomWebSocket"
+import CustomWebSocket from "../models/SocketClients"
 import Driver from "../models/Driver"
 import ServerSocket from "../models/ServerSocket"
 import { User } from "../models/User"
+import SocketClients from "../models/SocketClients"
 
 const search = express.Router()
 
@@ -13,10 +14,9 @@ search.get('/search', async (req, res) => {
 
     let driverDispo :any[] = []
 
-    // const io = ServerSocket.getInstance()
-    const clients = CustomWebSocket.getClients()
+    const clients = SocketClients.getDrivers()
 
-    io.to('drivers').emit('dispo', "are you dispo ?", {id: 1, name: "nante"})
+    io.to('drivers').emit('dispo')
 
     for(let socket of clients) {
         socket.on('disponible', (arg) => {
@@ -33,7 +33,12 @@ search.get('/search', async (req, res) => {
             console.log(userTemp)
             response.push(userTemp)
         }
-        res.json(response)
+        if(response.length == 0) {
+            res.json({"message" : "Aucun chauffeurs trouvé"})
+        }
+        else {
+            res.json(response)
+        }
     }, 5000);
 })
 

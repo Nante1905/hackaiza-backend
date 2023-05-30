@@ -2,7 +2,12 @@ import { Connection } from "../connection/Connection"
 import Driver from "./Driver"
 
 export class User {
-    public username :string
+    idUser :number
+    name :string
+    birthday :Date
+    telephone :string
+    email :string
+    idRole :number
     public password: string
     constructor() {
         
@@ -18,10 +23,27 @@ export class User {
         let user :User = null
         if(results.length != 0) {
             user = new User()
-            user.username = results[0].username
+            user.email = results[0].email
             user.password = results[0].password
         }
 
+
+        return user
+    }
+
+    public static findUserById = async (id :number) => {
+        let connection = Connection.getConnection()
+        let query = `select * from users where idUser=${id}`
+
+        let [results, metadata] :any = await connection.query(query)
+        let user :User = null
+
+        if(results) {
+            user = new User()
+            user.idUser = results[0].iduser
+            user.idRole = results[0].idrole
+            console.log(results[0])
+        }
 
         return user
     }
