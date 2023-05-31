@@ -1,4 +1,4 @@
-import { Server } from "socket.io"
+import { Server,Socket } from "socket.io"
 import http from "http"
 import express from "express"
 import auth from "./routes/auth"
@@ -6,6 +6,8 @@ import SocketClients from "./models/SocketClients"
 import search from "./routes/search"
 import ServerSocket from "./models/ServerSocket"
 import { User } from "./models/User"
+import user from "./routes/user"
+import authentification from "./routes/authentification"
 require("dotenv").config()
 
 const app = express()
@@ -20,6 +22,8 @@ app.get("/", (req, res) => {
 })
 app.use('/auth', auth)
 app.use("/", search)
+app.use('/user', user);
+app.use('/authentification', authentification)
 
 io.on("connection", (socket) => {
     socket.on("whoami", async (id) => {
