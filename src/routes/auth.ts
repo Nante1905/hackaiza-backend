@@ -2,9 +2,8 @@ import express from "express"
 import { User } from "./../models/User"
 
 const auth = express.Router()
-auth.get('/', (req, res) => {
-
-    User.findWithUserAndPass("admin", "admin").then((user) => {
+auth.get('/', async (req, res) => {
+    let user = await User.findWithUserAndPass("admin", "admin")
         if(user != null) {
             res.json({
                 "message" : "connected"
