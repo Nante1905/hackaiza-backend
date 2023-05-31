@@ -1,8 +1,9 @@
-import { Server } from "socket.io"
+import { Server,Socket } from "socket.io"
 import http from "http"
 import express from "express"
 import auth from "./routes/auth"
 import user from "./routes/user"
+import authentification from "./routes/authentification"
 
 require("dotenv").config()
 
@@ -16,9 +17,10 @@ app.get("/", (req, res) => {
 app.use('/auth', auth)
 
 app.use('/user', user);
+app.use('/authentification', authentification)
 
-io.on("connection", (socket) => {
-    console.log("User connected on socket")
-})
+io.on('connection', (socket: Socket) => {
+
+  });
 
 server.listen(3000, () => console.log("app listening"))
