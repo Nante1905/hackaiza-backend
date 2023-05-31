@@ -15,7 +15,7 @@ auth.get('/', (req, res) => {
                 "message": "error"
             })
         }
-    })
+    }).catch((error) => {})
 })
 
 export default auth
