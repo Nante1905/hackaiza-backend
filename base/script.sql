@@ -43,6 +43,8 @@ CREATE TABLE courses(
     idCourse SERIAL PRIMARY KEY,
     idChauffeur INT,
     idClient INT,
+    depart GEOGRAPHY,
+    destination GEOGRAPHY,
     dateCourse DATE,
     status INT,
     prix DECIMAL,
