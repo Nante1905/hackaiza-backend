@@ -3,29 +3,18 @@ import { Role } from "../models/Role"
 import { UserAfa } from "../models/UserAfa"
 
 const authentification = express.Router()
-authentification.get('/', (req, res) => {
+authentification.get('/', async (req, res) => {
 
-    UserAfa.checkUser('Rabe1', 'rabe@gmail.com').then((user :UserAfa) => {
-        
-        if(user != null) {
-            Role.selectRole(user.idRole).then((role :Role) => {
-                res.json({
-                    "message" : "Connected",
-                    "Role" : role.title
-                })
-                
-            })
-        } else {
-            res.json({
-                "message": "error"
-            })
-        }
-    }).catch((error) => {
-        // console.log(error.message);
+    let user = await UserAfa.checkUser('steph@gmail.com', 'azerty')
+    if(user != null) {
         res.json({
-            "message_erreur": error.message
+            "user" : JSON.stringify(user)                
+        })            
+    } else {
+        res.json({
+            "message": "Une erreur c'est produite, vérifier votre mail ou mot de passe"
         })
-    })
+    }
 })
 
 

@@ -6,22 +6,39 @@ import { Role } from "./Role"
 
 
 export class UserAfa { 
+    idUser :number
+    nom :string
+    prenom :string
+    dateNaissance :Date
+    email :string
+    phone :string
+    pass :string
 
-    constructor(public idUser :number, public name :string, public forName :string, public birthday :Date, public telephone :string, public email :string, public idRole :number, public password :string){
+    constructor(){
 
     }
 
-    public static checkUser = async (name, email) => {
+    public static checkUser = async (email, pass) => {
         let connection = Connection.getConnection()
         // console.log(connection)
-        let query = "SELECT * FROM users WHERE name = '" + name + "' AND email = '" + email + "'"
+        let query =`SELECT * FROM users WHERE email = '${email}' AND pass = '${pass}'`
 
         let [results, metadata] :any = await connection.query(query)
         console.log(results)
 
         let user :UserAfa = null
         if(results.length != 0) {
-            user = new UserAfa(results[0].iduser, results[0].name, results[0].forname,results[0].birthday, results[0].telephone, results[0].email,results[0].idrole, results[0].password)
+            user = new UserAfa()
+            
+            user.idUser = results[0].idUser
+            user.nom = results[0].nom
+            user.prenom = results[0].prenom
+            user.dateNaissance = results[0].dateNaissance
+            user.email = results[0].email
+            user.phone = results[0].phone
+            user.pass = results[0].pass
+
+
             const socket = io('http://localhost:3000');
             socket.on('connect', () => {
                 console.log('Connecté au serveur Socket.IO');
@@ -35,15 +52,7 @@ export class UserAfa {
             throw new Error("Identifient of user not found");
         }
 
-        return new Promise((resolve, reject) => {
-            if(user != null) {
-                resolve(user)
-            }
-            else {
-                const error = new Error("Identifient of user not found");
-                reject(error);
-            }
-        })
+        return user
     }
 
 }
