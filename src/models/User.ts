@@ -1,5 +1,4 @@
 import { Connection } from "../connection/Connection"
-import Driver from "./Driver"
 
 export class User {
     idUser :number
@@ -14,9 +13,9 @@ export class User {
     }
 
 
-    public static findWithUserAndPass = async (username, pass) => {
+    public static findWithUserAndPass = async (email, pass) => {
         let connection = Connection.getConnection()
-        let query = "select * from users where username='admin' and password='admin'"
+        let query = `select * from users where email='${email}' and pass=md5('${pass}')`
 
         let [results, metadata] :any = await connection.query(query)
         console.log(results);
@@ -49,75 +48,68 @@ export class User {
         return user
     }
 
-    public static SignUpUser = async (name, forname, birthdate, telephone, email, password) =>
-    {
-        let connection = Connection.getConnection();
-        let query = `insert into users(name, forname, birthdate, telephone, email, idrole, password) values ('${name}', '${forname}', '${birthdate}', '${telephone}', '${email}', 1, md5('${password}'))`;
+    public static SignUpUser = async (body) => {
+        console.log(body)
+        let { nom, prenom, naissance, email, phone, password, activation } = body
 
-        let [results, metadata] :any = null;
-        try
-        { 
-            [results, metadata] = await connection.query(query);
-        } 
-        catch (e)
-        {
-            console.log("Exception sur signup user " + e);
-            throw e;
+        let connection = Connection.getConnection();
+
+        // Jerena oe existant ve ilay code d'activation
+        let activationQuery = `select * from activation where code='${activation}' and status='1'` // status = 1 midika oe avaliable le code
+        let [activationResult, metaActivation] = await connection.query(activationQuery)
+        if(activationResult.length < 1) {
+            return null
         }
-        console.log(results);
+
+        // Raha disponible le code
+        let query = `insert into users values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}'))`;
+
+        // let [results,] :any
+        try { 
+            let [results,] = await connection.query(query);
+            return results
+        } 
+        catch (e) {
+            console.log("Exception sur signup user " + e);
+            // throw e;
+        }
     }
 
-    public static SignUpDriver = async (name, forname, birthdate, telephone, email, password, registration, idBrand, estimationPrice) =>
-    {
+    public static signDriver = async (body) => {
+
+        let { nom, prenom, naissance, email, phone, password, idMarque, model, plaque, prix, activation } = body
+
         let connection = Connection.getConnection();
-        let queryuser = `insert into users(name, forname, birthdate, telephone, email, idrole, password) values ('${name}', '${forname}', '${birthdate}', '${telephone}', '${email}', 2, md5('${password}'))`;
 
-        let [results, metadata] :any = null;
-        try
-        { 
-            [results, metadata] = await connection.query(queryuser);
-        } 
-        catch (e)
-        {
-            console.log("Exception sur signup user " + e);
-            throw e;
+    //     // Jerena oe existant ve ilay code d'activation
+        let activationQuery = `select * from activation where code='${activation}' and status='1'` // status = 1 midika oe avaliable le code
+        let [activationResult, ] = await connection.query(activationQuery)
+        if(activationResult.length < 1) {
+            return null
         }
-        console.log("metadata user " + metadata);
 
-        if ([results, metadata].length != 0) 
-        {
-            let querylastuser = "select * from users order by id desc limit 1"
-            let [results_lastuser, metadata_lastuser] :any = null;
-            let id = 0;
-            
-            try
-            { 
-                [results_lastuser, metadata_lastuser] = await connection.query(querylastuser);
-            } 
-            catch (e)
-            {
-                console.log("Exception sur get last user " + e);
-                throw e;
-            }
-            console.log("Last inserted user " + results_lastuser);
-            
-            
-            if(results_lastuser.length != 0) {
-                id =results_lastuser[0].idusers
+        // Inserena ao am user sy chauffeur izy transactionnel
+        const t = await connection.transaction()
+        let queryuser = `insert into users values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}')) returning idUser`;
 
-                let querydriver = `insert into driver values (${id}, '${registration}', ${idBrand}, 1, ${estimationPrice}')`; 
-                let [results_driver, metadata_driver] :any = null;
-                try
-                { 
-                    [results_driver, metadata_driver] = await connection.query(querydriver);
-                } 
-                catch (e)
-                {
-                    console.log("Exception sur signup user " + e);
-                    throw e;
+        let driverQuery = `insert into chauffeurs values (default, :idUsers, ${idMarque}, '${model}', '${plaque}', ${prix})`
+
+        try {
+            let [results, ] :any = await connection.query(queryuser, { transaction: t })
+
+            console.log('result => ', results)
+
+            await connection.query(driverQuery, {
+                transaction: t,
+                replacements: {
+                    idUsers: results[0].iduser
                 }
-                console.log("metadata driver " + metadata_driver);
-            }
+            })
+            t.commit()
+        } catch(e) {
+            t.rollback()
+            console.log(e)
         }
+        
     }
 }

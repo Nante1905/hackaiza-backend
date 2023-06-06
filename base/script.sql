@@ -49,7 +49,7 @@ CREATE TABLE courses(
     status INT,
     prix DECIMAL,
     FOREIGN KEY (idChauffeur) REFERENCES chauffeurs(idChauffeur),
-    FOREIGN KEY (idClient) REFERENCES client(idClient)
+    FOREIGN KEY (idClient) REFERENCES users(idUser)
 );
 
 CREATE TABLE commentaires(
@@ -58,15 +58,15 @@ CREATE TABLE commentaires(
     idClient INT,
     text TEXT,
     dateCom DATE,
-    FOREIGN KEY (idChauffeur) REFERENCES chauffeur(idChauffeur),
-    FOREIGN KEY (idClient) REFERENCES client(idClient)
+    FOREIGN KEY (idChauffeur) REFERENCES chauffeurs(idChauffeur),
+    FOREIGN KEY (idClient) REFERENCES users(idUser)
 );
 
 CREATE TABLE notes(
     idNote SERIAL PRIMARY KEY,
     idChauffeur INT,
     valeur INT,
-    FOREIGN KEY (idChauffeur) REFERENCES chauffeur(idChauffeur)
+    FOREIGN KEY (idChauffeur) REFERENCES chauffeurs(idChauffeur)
 );
 
 CREATE TABLE activation(

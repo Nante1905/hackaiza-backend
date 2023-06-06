@@ -1,16 +1,16 @@
-import { Server,Socket } from "socket.io"
+import { Server } from "socket.io"
 import http from "http"
-import express from "express"
+import express, { urlencoded } from "express"
 import auth from "./routes/auth"
 import SocketClients from "./models/SocketClients"
 import search from "./routes/search"
 import ServerSocket from "./models/ServerSocket"
 import { User } from "./models/User"
-import user from "./routes/user"
-import authentification from "./routes/authentification"
+import signup from "./routes/signup"
 require("dotenv").config()
 
 const app = express()
+app.use(urlencoded())
 const server = http.createServer(app)
 
 export const io = new Server(server)
@@ -22,8 +22,8 @@ app.get("/", (req, res) => {
 })
 app.use('/auth', auth)
 app.use("/", search)
-app.use('/user', user);
-app.use('/authentification', authentification)
+app.use('/signup', signup)
+
 
 io.on("connection", (socket) => {
     socket.on("whoami", async (id) => {
@@ -49,4 +49,4 @@ io.on("connection", (socket) => {
     console.log("User connected on socket")
 })
 
-server.listen(3000, process.env.HOST, () => console.log("app listening"))
+server.listen(process.env.PORT, () => console.log("app listening"))
