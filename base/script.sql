@@ -1,3 +1,11 @@
+CREATE table roles (
+    idrole SERIAL not null PRIMARY key,
+    nom VARCHAR(100)
+);
+
+insert into roles values (default, 'client');
+insert into roles values (default, 'chauffeur');
+
 CREATE TABLE users(
     idUser SERIAL NOT NULL PRIMARY KEY,
     nom VARCHAR(45),
@@ -5,7 +13,9 @@ CREATE TABLE users(
     dateNaissance DATE,
     email VARCHAR(45),
     phone VARCHAR(25),
-    pass TEXT
+    pass TEXT,
+    idrole int,
+    FOREIGN key(idrole) REFERENCES role(idrole)
 );
 
 CREATE TABLE marque(

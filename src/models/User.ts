@@ -62,7 +62,7 @@ export class User {
         }
 
         // Raha disponible le code
-        let query = `insert into users values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}'))`;
+        let query = `insert into users values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}'), 1)`;
 
         // let [results,] :any
         try { 
@@ -90,7 +90,7 @@ export class User {
 
         // Inserena ao am user sy chauffeur izy transactionnel
         const t = await connection.transaction()
-        let queryuser = `insert into users values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}')) returning idUser`;
+        let queryuser = `insert into users values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}'), 2) returning idUser`;
 
         let driverQuery = `insert into chauffeurs values (default, :idUsers, ${idMarque}, '${model}', '${plaque}', ${prix})`
 
