@@ -3,29 +3,45 @@ import { User } from "./../models/User"
 
 const signup = express.Router()
 signup.post('/client', async (req, res) => {
-    let response = await User.SignUpUser(req.body)
-    if(response) {
-        res.status(200).json({
-            "message" : "Inscrit"
-        })
+    try {
+        let response = await User.SignUpUser(req.body)
+        console.log(response)
+        if(response === true) {
+            res.status(200).json({
+                "code" : 1,
+                "message" : "Inscrit"
+            })
+        }
+        else if(response == null) {
+            res.status(500).json({
+                'code' : 2,
+                "message" : "Code d'activation invalide"
+            })
+        }
     }
-    else {
+    catch(e) {
+        console.log(e)
         res.status(500).json({
-            "message" : "Error on inscription"
+            'code' : 3,
+            "message" : "Erreur interne du serveur"
         })
     }
 })
 
 signup.post('/driver', async (req, res) => {
-    let response = await User.signDriver(req.body)
-    if(response) {
+    try {
+        await User.signDriver(req.body)
+        
         res.status(200).json({
+            "code" : 1,
             "message" : "Inscrit"
         })
-    }
-    else {
+
+    } catch(e) {
+        console.log(e)
         res.status(500).json({
-            "message" : "Error on inscription"
+            "code" : 0,
+            "message" : "Erreur interne du serveur"
         })
     }
 })

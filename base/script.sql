@@ -82,5 +82,10 @@ CREATE TABLE notes(
 CREATE TABLE activation(
     idActivation SERIAL PRIMARY KEY,
     code VARCHAR(25),
-    status INT
+    status INT,
+    idrole int,
+    FOREIGN key(idrole) REFERENCES roles(idrole)
 );
+-- chauffeur details vue
+create or replace view v_chauffeurs as select u.idUser, u.nom, prenom, phone, email, m.nom marque, modele, plaque, prix from users u join chauffeurs on u.idUser = chauffeurs.iduser join marque m on m.idmarque = chauffeurs.idmarque;
+

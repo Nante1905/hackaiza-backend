@@ -3,11 +3,13 @@ import { Connection } from "../connection/Connection"
 export class User {
     idUser :number
     name :string
-    birthday :Date
+    birthday: Date
     telephone :string
     email :string
     idRole :number
-    public password: string
+    password: string
+    
+
     constructor() {
         
     }
@@ -15,16 +17,20 @@ export class User {
 
     public static findWithUserAndPass = async (email, pass) => {
         let connection = Connection.getConnection()
-        let query = `select * from users where email='${email}' and pass=md5('${pass}')`
-
-        let [results, metadata] :any = await connection.query(query)
-        console.log(results);
-
+        let query = `select * from users where (email='${email}' or phone='${email}') and pass=md5('${pass}')`
         let user :User = null
-        if(results.length != 0) {
-            user = new User()
-            user.email = results[0].email
-            user.password = results[0].password
+
+        try {
+            let [results, metadata] :any = await connection.query(query)
+            console.log(results[0]);
+
+            if(results.length != 0) {
+                user = new User()
+                user.idUser = results[0].iduser
+                user.email = results[0].email
+            }
+        } catch(e) {
+            console.log(e)
         }
 
 
@@ -35,14 +41,18 @@ export class User {
         let connection = Connection.getConnection()
         let query = `select * from users where idUser=${id}`
 
-        let [results, metadata] :any = await connection.query(query)
         let user :User = null
-
-        if(results) {
-            user = new User()
-            user.idUser = results[0].iduser
-            user.idRole = results[0].idrole
-            console.log(results[0])
+        
+        try {
+            let [results, metadata] :any = await connection.query(query)
+            if(results) {
+                user = new User()
+                user.idUser = results[0].iduser
+                user.idRole = results[0].idrole
+                console.log("ssssssssss ", results[0])
+            }
+        } catch(e) {
+            console.log(e)
         }
 
         return user
@@ -56,9 +66,14 @@ export class User {
 
         // Jerena oe existant ve ilay code d'activation
         let activationQuery = `select * from activation where code='${activation}' and status='1'` // status = 1 midika oe avaliable le code
-        let [activationResult, metaActivation] = await connection.query(activationQuery)
+        let [activationResult,] = await connection.query(activationQuery)
         if(activationResult.length < 1) {
             return null
+        }
+
+        let naissanceDate :Date = new Date(naissance)
+        if(new Date().getFullYear() - naissanceDate.getFullYear() < 18) {
+            throw new Error('Date de naissance invalide')
         }
 
         // Raha disponible le code
@@ -67,7 +82,7 @@ export class User {
         // let [results,] :any
         try { 
             let [results,] = await connection.query(query);
-            return results
+            return true
         } 
         catch (e) {
             console.log("Exception sur signup user " + e);
@@ -76,6 +91,7 @@ export class User {
     }
 
     public static signDriver = async (body) => {
+        console.log(body)
 
         let { nom, prenom, naissance, email, phone, password, idMarque, model, plaque, prix, activation } = body
 
@@ -85,7 +101,12 @@ export class User {
         let activationQuery = `select * from activation where code='${activation}' and status='1'` // status = 1 midika oe avaliable le code
         let [activationResult, ] = await connection.query(activationQuery)
         if(activationResult.length < 1) {
-            return null
+            throw new Error('Code activation invalide')
+        }
+
+        let naissanceDate :Date = new Date(naissance)
+        if(new Date().getFullYear() - naissanceDate.getFullYear() < 18) {
+            throw new Error('Date de naissance invalide')
         }
 
         // Inserena ao am user sy chauffeur izy transactionnel

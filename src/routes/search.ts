@@ -8,9 +8,8 @@ import SocketClients from "../models/SocketClients"
 
 const search = express.Router()
 
-search.get('/search', async (req, res) => {
-    let longitude = <number>req.body?.longitude
-    let latitude = <number>req.body?.latitude
+search.get('/', async (req, res) => {
+    let { lat, lng } = req.body
 
     let driverDispo :any[] = []
 
@@ -25,7 +24,7 @@ search.get('/search', async (req, res) => {
         })
     }
 
-    let response :User[] = []
+    let response :Driver[] = []
 
     setTimeout(async () => {
         for(let driver of driverDispo) {
@@ -39,7 +38,7 @@ search.get('/search', async (req, res) => {
         else {
             res.json(response)
         }
-    }, 5000);
+    }, 3000);
 })
 
 export default search
