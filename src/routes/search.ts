@@ -10,7 +10,7 @@ import { Connection } from "../connection/Connection"
 const search = express.Router()
 
 search.get('/', async (req, res) => {
-    let { lat, lng } = req.body
+    let { start, destination } = req.body
 
     let driverDispo :any[] = []
 
@@ -27,14 +27,21 @@ search.get('/', async (req, res) => {
 
     let connection = Connection.getConnection()
     let response :Driver[] = []
-
+    let min = 1;
     setTimeout(async () => {
+        let userTemp: Driver;
         for(let driver of driverDispo) {
-            let userTemp = await Driver.findDriverById(driver.id, connection)
-            userTemp.lng = driver.lng
-            userTemp.lat = driver.lat
+            // let userTemp = await Driver.findDriverById(driver.id, connection)
+            // userTemp.lng = driver.lng
+            // userTemp.lat = driver.lat
+            // response.push(userTemp)
+            userTemp = new Driver();
+            userTemp.id = driver.id;
+            
             console.log(userTemp)
-            response.push(userTemp)
+            if(userTemp.setAttributeIfNear(start, destination, min, connection)) {
+                response.push(userTemp);
+            }
         }
         if(response.length == 0) {
             res.json({"message" : "Aucun chauffeurs trouvé"})

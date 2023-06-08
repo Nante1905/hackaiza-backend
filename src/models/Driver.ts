@@ -4,11 +4,7 @@ import { User } from "./User"
 
 class Driver {
     id :number
-    registration :string
-    estimatePrice :number
-    distance: number
-    lng: number
-    lat: number
+
     private _nom: string
     public get nom(): string {
         return this._nom
@@ -73,6 +69,30 @@ class Driver {
         this._prix = value
     }
 
+    private _lng: number
+    public get lng(): number {
+        return this._lng
+    }
+    public set lng(value: number) {
+        this._lng = value
+    }
+
+    private _lat: number
+    public get lat(): number {
+        return this._lat
+    }
+    public set lat(value: number) {
+        this._lat = value
+    }
+
+    private _distance: number
+    public get distance(): number {
+        return this._distance
+    }
+    public set distance(value: number) {
+        this._distance = value
+    }
+
 
     constructor() {
     }
@@ -99,7 +119,7 @@ class Driver {
     }
 
     public setAttributeIfNear = async (start: Place, destination: Place, min: number, connection: Sequelize) => {
-        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326))) as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distPath from driver where idDriver=${this.id}`
+        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distPath from driver where idDriver=${this.id}`
 
         let [results, metadata] :any = await connection.query(query)
         
@@ -107,17 +127,25 @@ class Driver {
 
         if(results.length > 0) {
             if(results[0].distStart <= min) {
-                this.id = results[0].iddriver
-                this.registration = results[0].regitration
-                this.estimatePrice = results[0].estimateprice*results[0].distPath
+                this.id = results[0].iduser
+                this.nom = results[0].nom
+                this.prenom = results[0].prenom
+                this.phone = results[0].phone
+                this.email = results[0].email
+                this.marque = results[0].marque
+                this.modele = results[0].model
+                this.plaque = results[0].plaque
+                this.prix = results[0].prix*results[0].distPath
                 this.distance = results[0].distStart
+
+                return true;
             }
             else {
-                return
+                return false;
             }
         }
         else {
-            return
+            return false;
         }
 
     }
