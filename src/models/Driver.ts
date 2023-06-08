@@ -98,7 +98,7 @@ class Driver {
     }
 
     public static async findDriverById(id :number, connection: Sequelize) {
-        let query = `select * from driver where idDriver=${id}`
+        let query = `select * from v_chauffeurs where idDriver=${id}`
         let [results, metadata] :any = await connection.query(query)
 
         let driver = new Driver()
@@ -119,7 +119,7 @@ class Driver {
     }
 
     public setAttributeIfNear = async (start: Place, destination: Place, min: number, connection: Sequelize) => {
-        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distPath from driver where idDriver=${this.id}`
+        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distPath from v_chauffeurs where idDriver=${this.id}`
 
         let [results, metadata] :any = await connection.query(query)
         

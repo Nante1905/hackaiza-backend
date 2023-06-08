@@ -11,7 +11,13 @@ const search = express.Router()
 
 search.get('/', async (req, res) => {
     let { start, destination } = req.body
-
+    console.log('place ');
+    console.log(req.body);
+    
+    console.log(start);
+    console.log(destination);
+    
+    
     let driverDispo :any[] = []
 
     const clients = SocketClients.getDrivers()
@@ -21,7 +27,7 @@ search.get('/', async (req, res) => {
     for(let socket of clients) {
         socket.on('disponible', (arg) => {
             driverDispo.push(arg)
-            console.log(arg)
+            // console.log(arg)
         })
     }
 
@@ -39,9 +45,9 @@ search.get('/', async (req, res) => {
             userTemp.id = driver.id;
             
             console.log(userTemp)
-            if(userTemp.setAttributeIfNear(start, destination, min, connection)) {
-                response.push(userTemp);
-            }
+            // if(userTemp.setAttributeIfNear(start, destination, min, connection)) {
+            //     response.push(userTemp);
+            // }
         }
         if(response.length == 0) {
             res.json({"message" : "Aucun chauffeurs trouvé"})

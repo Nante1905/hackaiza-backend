@@ -15,7 +15,7 @@ CREATE TABLE users(
     phone VARCHAR(25),
     pass TEXT,
     idrole int,
-    FOREIGN key(idrole) REFERENCES role(idrole)
+    FOREIGN key(idrole) REFERENCES roles(idrole)
 );
 
 CREATE TABLE marque(
