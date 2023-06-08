@@ -10,10 +10,10 @@ import { Connection } from "../connection/Connection"
 const search = express.Router()
 
 search.post('/', async (req, res) => {
-    let { start, destination } = req.body
+    let { start, destination, min } = req.body
     console.log('place ');
     // console.log(start, destination);
-    
+    console.log(min);
     console.log(start);
     console.log(destination);
     
@@ -33,7 +33,6 @@ search.post('/', async (req, res) => {
 
     let connection = Connection.getConnection()
     let response :Driver[] = []
-    let min = 1;
     let checkDistance = false;
     console.log(driverDispo);
     
