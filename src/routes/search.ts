@@ -9,9 +9,8 @@ import { Connection } from "../connection/Connection"
 
 const search = express.Router()
 
-search.get('/search', async (req, res) => {
-    let longitude = <number>req.body?.longitude
-    let latitude = <number>req.body?.latitude
+search.get('/', async (req, res) => {
+    let { lat, lng } = req.body
 
     let driverDispo :any[] = []
 
@@ -26,8 +25,9 @@ search.get('/search', async (req, res) => {
         })
     }
 
-    let response :User[] = []
     let connection = Connection.getConnection()
+    let response :Driver[] = []
+
     setTimeout(async () => {
         for(let driver of driverDispo) {
             let userTemp = await Driver.findDriverById(driver.id, connection)
@@ -42,8 +42,7 @@ search.get('/search', async (req, res) => {
         else {
             res.json(response)
         }
-    }, 5000);
-
+    }, 3000);
 })
 
 export default search
