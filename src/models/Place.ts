@@ -1,12 +1,12 @@
 class Place {
     name!: string;
-    longitude!: number;
-    latitude!: number;
+    lng!: number;
+    lat!: number;
 
-    constructor(name:string, longitude: number, latitude: number) {
+    constructor(name:string, lng: number, lat: number) {
         this.name = name;
-        this.longitude = longitude;
-        this.latitude = latitude;
+        this.lng = lng;
+        this.lat = lat;
     }
 }
 

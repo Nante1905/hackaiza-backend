@@ -43,6 +43,7 @@ search.get('/search', async (req, res) => {
             res.json(response)
         }
     }, 5000);
+
 })
 
 export default search
