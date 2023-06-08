@@ -117,36 +117,38 @@ class Driver {
 
         return driver
     }
-
+    
     public setAttributeIfNear = async (start: Place, destination: Place, min: number, connection: Sequelize) => {
-        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distPath from v_chauffeurs where idDriver=${this.id}`
+        console.log('localisation ' + this.lng + ' ' + this.lat);
+        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distPath from v_chauffeurs where iduser=${this.id}`
 
+        console.log('execute query');
+        
         let [results, metadata] :any = await connection.query(query)
         
         console.log(results)
 
         if(results.length > 0) {
-            if(results[0].distStart <= min) {
+            
+            console.log('startDist ' + results[0].diststart);
+            console.log('path ' + results[0].distpath);
+            
+            if(results[0].diststart <= min) {
                 this.id = results[0].iduser
                 this.nom = results[0].nom
                 this.prenom = results[0].prenom
                 this.phone = results[0].phone
                 this.email = results[0].email
                 this.marque = results[0].marque
-                this.modele = results[0].model
+                this.modele = results[0].modele
                 this.plaque = results[0].plaque
-                this.prix = results[0].prix*results[0].distPath
-                this.distance = results[0].distStart
+                this.prix = results[0].prix*results[0].distpath
+                this.distance = results[0].diststart
 
                 return true;
             }
-            else {
-                return false;
-            }
         }
-        else {
-            return false;
-        }
+        return false;
 
     }
 }

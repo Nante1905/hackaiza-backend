@@ -9,10 +9,10 @@ import { Connection } from "../connection/Connection"
 
 const search = express.Router()
 
-search.get('/', async (req, res) => {
+search.post('/', async (req, res) => {
     let { start, destination } = req.body
     console.log('place ');
-    console.log(req.body);
+    // console.log(start, destination);
     
     console.log(start);
     console.log(destination);
@@ -27,13 +27,16 @@ search.get('/', async (req, res) => {
     for(let socket of clients) {
         socket.on('disponible', (arg) => {
             driverDispo.push(arg)
-            // console.log(arg)
+            console.log(arg)
         })
     }
 
     let connection = Connection.getConnection()
     let response :Driver[] = []
     let min = 1;
+    let checkDistance = false;
+    console.log(driverDispo);
+    
     setTimeout(async () => {
         let userTemp: Driver;
         for(let driver of driverDispo) {
@@ -43,11 +46,16 @@ search.get('/', async (req, res) => {
             // response.push(userTemp)
             userTemp = new Driver();
             userTemp.id = driver.id;
+            userTemp.lat = driver.lat
+            userTemp.lng = driver.lng
             
             console.log(userTemp)
-            // if(userTemp.setAttributeIfNear(start, destination, min, connection)) {
-            //     response.push(userTemp);
-            // }
+            checkDistance = await userTemp.setAttributeIfNear(start, destination, min, connection);
+            if(checkDistance) {
+                console.log(userTemp);
+                
+                response.push(userTemp);
+            }
         }
         if(response.length == 0) {
             res.json({"message" : "Aucun chauffeurs trouvé"})
@@ -55,7 +63,7 @@ search.get('/', async (req, res) => {
         else {
             res.json(response)
         }
-    }, 3000);
+    }, 5000);
 })
 
 export default search
