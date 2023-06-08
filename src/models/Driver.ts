@@ -1,5 +1,4 @@
 import { Sequelize } from "sequelize"
-import { Connection } from "../connection/Connection"
 import { User } from "./User"
 
 class Driver extends User {
@@ -11,7 +10,7 @@ class Driver extends User {
     lat: number
 
     constructor() {
-        super('', '')
+        super()
     }
 
     public static async findDriverById(id :number, connection: Sequelize) {
