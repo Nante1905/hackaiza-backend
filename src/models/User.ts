@@ -112,4 +112,25 @@ export class User {
         }
         
     }
+    public static demandeCourse = async (body) =>{
+        let {depart,destination,idChauffeur,idClient}=body
+        let connection = Connection.getConnection();
+        let date= Date.now();
+        const t = await connection.transaction()
+        let query = `insert into courses values (default, ${idChauffeur}, ${idClient}, 'POINT(${depart.latitude},${depart.longitude})', 'POINT(${destination.latitude},${destination.longitude})', '${date}',2,0))`;
+
+        try {
+            let [results, ] :any = await connection.query(query, { transaction: t })
+
+            console.log('result => ', results)
+
+            await connection.query(query, {
+                transaction: t,
+            })
+            t.commit()
+        } catch(e) {
+            t.rollback()
+            console.log(e)
+        }
+    }
 }
