@@ -120,7 +120,8 @@ class Driver {
     
     public setAttributeIfNear = async (start: Place, destination: Place, min: number, connection: Sequelize) => {
         console.log('localisation ' + this.lng + ' ' + this.lat);
-        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326), st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)))/1000 as distPath from v_chauffeurs where iduser=${this.id}`
+        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326)::geography, st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)::geography))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326)::geography, st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)::geography))/1000 as distPath from v_chauffeurs where iduser=${this.id} order by distStart;`
+
 
         console.log('execute query');
         
@@ -129,7 +130,6 @@ class Driver {
         console.log(results)
 
         if(results.length > 0) {
-            
             console.log('startDist ' + results[0].diststart);
             console.log('path ' + results[0].distpath);
             

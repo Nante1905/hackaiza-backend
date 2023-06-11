@@ -57,7 +57,7 @@ search.post('/', async (req, res) => {
             }
         }
         if(response.length == 0) {
-            res.json({"message" : "Aucun chauffeurs trouvé"})
+            res.json([])
         }
         else {
             res.json(response)
