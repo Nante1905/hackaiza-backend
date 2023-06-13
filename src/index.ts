@@ -9,6 +9,7 @@ import { User } from "./models/User"
 import signup from "./routes/signup"
 import cors from "cors"
 import marque from "./routes/marque"
+import course from "./routes/course"
 
 require("dotenv").config()
 
@@ -31,7 +32,7 @@ app.use('/auth', auth)
 app.use("/search", search)
 app.use('/signup', signup)
 app.use('/marques', marque)
-
+app.use('/course', course)
 
 io.on("connection", (socket) => {
     socket.on("whoami", async (id) => {
