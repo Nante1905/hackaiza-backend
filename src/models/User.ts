@@ -15,9 +15,9 @@ export class User {
     }
 
 
-    public static findWithUserAndPass = async (email, pass) => {
+    public static findWithUserAndPass = async (email, pass, role) => {
         let connection = Connection.getConnection()
-        let query = `select * from users where (email='${email}' or phone='${email}') and pass=md5('${pass}')`
+        let query = `select * from users where (email='${email}' or phone='${email}') and pass=md5('${pass}') and idrole=${role}`
         let user :User = null
 
         try {
