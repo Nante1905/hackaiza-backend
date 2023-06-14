@@ -9,6 +9,7 @@ import { User } from "./models/User"
 import signup from "./routes/signup"
 import cors from "cors"
 import marque from "./routes/marque"
+import { demande } from "./routes/demande"
 
 require("dotenv").config()
 
@@ -31,6 +32,8 @@ app.use('/auth', auth)
 app.use("/search", search)
 app.use('/signup', signup)
 app.use('/marques', marque)
+app.use('/demande', demande)
+
 
 
 io.on("connection", (socket) => {

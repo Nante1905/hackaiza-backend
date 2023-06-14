@@ -2,9 +2,10 @@ import { Connection } from "../connection/Connection"
 
 export class User {
     idUser :number
-    name :string
-    birthday: Date
-    telephone :string
+    nom :string
+    prenom :string
+    naissance: Date
+    phone :string
     email :string
     idRole :number
     password: string
@@ -27,6 +28,8 @@ export class User {
             if(results.length != 0) {
                 user = new User()
                 user.idUser = results[0].iduser
+                user.nom = results[0].nom
+                user.prenom = results[0].prenom
                 user.email = results[0].email
             }
         } catch(e) {

@@ -98,7 +98,7 @@ class Driver {
     }
 
     public static async findDriverById(id :number, connection: Sequelize) {
-        let query = `select * from v_chauffeurs where idDriver=${id}`
+        let query = `select * from v_chauffeurs where iduser=${id}`
         let [results, metadata] :any = await connection.query(query)
 
         let driver = new Driver()
