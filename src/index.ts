@@ -44,11 +44,13 @@ io.on("connection", (socket) => {
             let user = await User.findUserById(id)
             console.log(user)
             if(user && user.idRole == 2) {
+                SocketClients.deleteDriver(socket)
                 SocketClients.addDriver(socket)
                 socket.join("drivers")
                 console.log("driver connected")
             }
             else if(user && user.idRole == 1) {
+                SocketClients.deleteClient(socket)
                 SocketClients.addClient(socket)
                 socket.join("clients")
                 console.log("client connected")

@@ -31,7 +31,7 @@ class Course {
     }
 
     public save() {
-        const query = `insert into courses values (default, ${this.idchauffeur}, ${this.idclient}, '${this.depart}', '${this.destination}', now(), 2, ((select prix from v_chauffeur where iduser=${this.idchauffeur})*(select st_distance(st_makepoint(${this.depart.lat}, ${this.depart.lng}, 4326)::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng}, 4326)::geography))))`
+        const query = `insert into courses values (default, ${this.idchauffeur}, ${this.idclient}, st_makepoint(${this.depart.lat}, ${this.depart.lng})::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng})::geography, now(), 2, ((select prix from v_chauffeurs where iduser=${this.idchauffeur})*(select st_distance(st_makepoint(${this.depart.lat}, ${this.depart.lng}, 4326)::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng}, 4326)::geography)/1000)))`
 
         let sequelize = Connection.getConnection()
 
@@ -40,6 +40,31 @@ class Course {
         } catch(e) {
             throw e
         } 
+    }
+
+    public static async findByIdChauffeur(id) {
+        const query = `select * from courses where idchauffeurs=${id}`
+        let sequelize = Connection.getConnection()
+        let courses :Course[] = []
+
+        try {
+            let [results, ] :any = await sequelize.query(query)
+            for(let result of results) {
+                let temp = new Course()
+                temp.idcourse = result.idcourse
+                temp.idchauffeur = result.idchauffeur
+                temp.idclient = result.idclient
+                temp.depart = result.depart
+                temp.destination = result.destination
+                temp.date = result.datecourse
+                temp.status = result.status
+                temp.prix = result.prix
+
+                courses.push(temp)
+            }
+        } catch(e) {
+            throw e
+        }
     }
     
 }

@@ -58,7 +58,7 @@ CREATE TABLE courses(
     dateCourse DATE,
     status INT,
     prix DECIMAL,
-    FOREIGN KEY (idChauffeur) REFERENCES chauffeurs(idChauffeur),
+    FOREIGN KEY (idChauffeur) REFERENCES users(iduser),
     FOREIGN KEY (idClient) REFERENCES users(idUser)
 );
 

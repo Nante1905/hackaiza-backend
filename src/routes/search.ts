@@ -62,7 +62,7 @@ search.post('/', async (req, res) => {
         else {
             res.json(response)
         }
-    }, 5000);
+    }, 10000);
 })
 
 export default search
