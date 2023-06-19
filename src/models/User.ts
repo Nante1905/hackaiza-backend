@@ -136,4 +136,19 @@ export class User {
         }
         
     }
+
+    public static async getNotificationToken(id) :Promise<string[]> {
+        let tokens = []
+        let query = `select * from tokens where iduser=${id}`
+        let sequelize = Connection.getConnection()
+        try {
+            let [result, ] = await sequelize.query(query)
+            for(let res of result) {
+                tokens.push(res)
+            }
+            return tokens
+        } catch(e) {
+            console.log(e)
+        }
+    }
 }

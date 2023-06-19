@@ -10,6 +10,8 @@ import signup from "./routes/signup"
 import cors from "cors"
 import marque from "./routes/marque"
 import { demande } from "./routes/demande"
+import admin from 'firebase-admin'
+import * as serviceKey from './../hackaiza-push-firebase-adminsdk-6t2ws-d4fdd6e171.json'
 
 require("dotenv").config()
 
@@ -28,11 +30,26 @@ export const io = new Server(server)
 
 ServerSocket.getServerInstance(io)
 
+admin.initializeApp({
+    credential: admin.credential.cert(serviceKey as admin.ServiceAccount)
+})
+
 app.use('/auth', auth)
 app.use("/search", search)
 app.use('/signup', signup)
 app.use('/marques', marque)
 app.use('/demande', demande)
+app.get('/test', async (req, res) => {
+    let messaging = admin.messaging()
+    await messaging.send({
+        token: "foAv2UNwQeiPkYCF3aAnO8:APA91bFSkFg_7cLoDYnVeOEzhpzUWT3NHkijs0CEdl3gTgx9SCeyPPKLza0XzeUNKfbE75ujHB5Nn01zF7F_NNIpdKwgLTCUF-MnwH-96SAmPdMUro04kNquoeuEeA28XrStO_W_-dpG",
+        notification: {
+            title: "Hello world",
+            body: "this is a test"
+        }
+    })
+    res.status(200).send()
+})
 
 
 

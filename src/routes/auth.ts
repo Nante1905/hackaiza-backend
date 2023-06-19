@@ -1,4 +1,5 @@
 import express from "express"
+import { Connection } from "../connection/Connection"
 import { User } from "./../models/User"
 
 const auth = express.Router()
@@ -39,6 +40,22 @@ auth.post('/driver', async (req, res) => {
         res.json({
             "message": "error"
         })
+    }
+})
+
+auth.post('/register', async (req, res) => {
+    let { token, id } = req.body
+    let query = `insert into tokens values (${id}, ${token})`
+    let sequelize = Connection.getConnection()
+    try {
+        await sequelize.query(query)
+        res.json({
+            "code": 1,
+            "message": "token saved"
+        })
+    } catch(e) {
+        console.log(e)
+        res.status(500).send()
     }
 })
 
