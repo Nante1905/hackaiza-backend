@@ -15,6 +15,7 @@ CREATE TABLE users(
     phone VARCHAR(25),
     pass TEXT,
     idrole int,
+    token text,
     FOREIGN key(idrole) REFERENCES roles(idrole)
 );
 
@@ -91,12 +92,6 @@ CREATE TABLE activation(
     status INT,
     idrole int,
     FOREIGN key(idrole) REFERENCES roles(idrole)
-);
-
-create table tokens (
-    iduser integer,
-    token text,
-    FOREIGN key(iduser) REFERENCES users(iduser)
 );
 -- chauffeur details vue;
 create or replace view v_chauffeurs as select u.idUser, u.nom, prenom, phone, email, m.nom marque, modele, plaque, prix from users u join chauffeurs on u.idUser = chauffeurs.iduser join marque m on m.idmarque = chauffeurs.idmarque;

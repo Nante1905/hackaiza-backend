@@ -1,17 +1,17 @@
 import { Server } from "socket.io"
 import http from "http"
 import express, { json, urlencoded } from "express"
-import auth from "./routes/auth"
-import SocketClients from "./models/SocketClients"
-import search from "./routes/search"
-import ServerSocket from "./models/ServerSocket"
-import { User } from "./models/User"
-import signup from "./routes/signup"
+import auth from "./src/routes/auth"
+import SocketClients from "./src/models/SocketClients"
+import search from "./src/routes/search"
+import ServerSocket from "./src/models/ServerSocket"
+import { User } from "./src/models/User"
+import signup from "./src/routes/signup"
 import cors from "cors"
-import marque from "./routes/marque"
-import { demande } from "./routes/demande"
+import marque from "./src/routes/marque"
+import { demande } from "./src/routes/demande"
 import admin from 'firebase-admin'
-import * as serviceKey from './../hackaiza-push-firebase-adminsdk-6t2ws-d4fdd6e171.json'
+import * as serviceKey from './hackaiza-push-firebase-adminsdk-6t2ws-d4fdd6e171.json'
 
 require("dotenv").config()
 
@@ -40,14 +40,6 @@ app.use('/signup', signup)
 app.use('/marques', marque)
 app.use('/demande', demande)
 app.get('/test', async (req, res) => {
-    let messaging = admin.messaging()
-    await messaging.send({
-        token: "foAv2UNwQeiPkYCF3aAnO8:APA91bFSkFg_7cLoDYnVeOEzhpzUWT3NHkijs0CEdl3gTgx9SCeyPPKLza0XzeUNKfbE75ujHB5Nn01zF7F_NNIpdKwgLTCUF-MnwH-96SAmPdMUro04kNquoeuEeA28XrStO_W_-dpG",
-        notification: {
-            title: "Hello world",
-            body: "this is a test"
-        }
-    })
     res.status(200).send()
 })
 
@@ -80,4 +72,4 @@ io.on("connection", (socket) => {
     console.log("User connected on socket")
 })
 
-server.listen(parseInt(process.env.PORT), process.env.HOST, () => console.log("app listening"))
+server.listen(parseInt(process.env.PORT), process.env.HOST, () => console.log(`app listening on ${process.env.HOST}:${process.env.PORT}`))

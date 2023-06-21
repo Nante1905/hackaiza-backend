@@ -10,7 +10,7 @@ import admin from 'firebase-admin'
 export const demande = express.Router()
 
 demande.post('/ask', async (req, res) => {
-    console.log("demande de course", req.body)
+    //console.log("demande de course", req.body)
 
     const sequelize = Connection.getConnection()
 
@@ -27,24 +27,24 @@ demande.post('/ask', async (req, res) => {
         course.depart = new Place(depart.name, parseFloat(depart.lng), parseFloat(depart.lat))
         course.destination = new Place(destination.name, parseFloat(destination.lng), parseFloat(destination.lat))
 
-        console.log(depart)
-        console.log(course)
+        //console.log(depart)
+        //console.log(course)
         course.save()
         for(let driver of SocketClients.getDrivers()) {
             if(driver.data.id == idChauffeur) {
                 driver.emit("course", "Misy couse ato zandry eh")
                 let messaging = admin.messaging()
-                let tokens = await User.getNotificationToken(idChauffeur)
-                for(let userToken of tokens) {
-                    await messaging.send({
-                        token: userToken,
+                let token = await User.getNotificationToken(idChauffeur)
+                console.log(token)
+                // for(let userToken of tokens) {
+                    messaging.send({
+                        token: token,
                         notification: {
                             title: "Vous avez un client",
                             body: `De ${depart.name} à ${destination.name}`
                         }
-                    })
-                }
-                // console.log(driver)
+                    }).then((result) => console.log(result))
+                // }
                 console.log("demande envoye")
             }
         }
@@ -59,7 +59,7 @@ demande.post('/ask', async (req, res) => {
 demande.get('/find/:id', async (req, res) => {
     try {
         let courses = await Course.findByIdChauffeur(req.params.id)
-        console.log("course an i " + req.params.id, courses)
+        //console.log("course an i " + req.params.id, courses)
 
         res.json(courses)
     } catch(e) {

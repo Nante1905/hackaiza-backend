@@ -6,10 +6,10 @@ const auth = express.Router()
 auth.post('/client', async (req, res) => {
 
     let { email, pass } = req.body
-    console.log(req.body)
+    //console.log(req.body)
 
     let user = await User.findWithUserAndPass(email, pass, 1)
-    console.log(user)
+    //console.log(user)
     if(user != null) {
         res.json({
             "message" : "connected",
@@ -26,10 +26,10 @@ auth.post('/client', async (req, res) => {
 auth.post('/driver', async (req, res) => {
 
     let { email, pass } = req.body
-    console.log(req.body)
+    //console.log(req.body)
 
     let user = await User.findWithUserAndPass(email, pass, 2)
-    console.log(user)
+    //console.log(user)
     if(user != null) {
         res.json({
             "message" : "connected",
@@ -44,8 +44,9 @@ auth.post('/driver', async (req, res) => {
 })
 
 auth.post('/register', async (req, res) => {
+    console.log(req.body)
     let { token, id } = req.body
-    let query = `insert into tokens values (${id}, ${token})`
+    let query = `update users set token= '${token.value}' where iduser=${id}`
     let sequelize = Connection.getConnection()
     try {
         await sequelize.query(query)
