@@ -15,6 +15,7 @@ CREATE TABLE users(
     phone VARCHAR(25),
     pass TEXT,
     idrole int,
+    token text,
     FOREIGN key(idrole) REFERENCES roles(idrole)
 );
 
@@ -58,7 +59,13 @@ CREATE TABLE courses(
     dateCourse DATE,
     status INT,
     prix DECIMAL,
-    FOREIGN KEY (idChauffeur) REFERENCES chauffeurs(idChauffeur),
+    departlat numeric,
+    departlng numeric,
+    destinationlat numeric,
+    destinationlng numeric,
+    nomdepart VARCHAR(250),
+    nomdestination VARCHAR(250),
+    FOREIGN KEY (idChauffeur) REFERENCES users(iduser),
     FOREIGN KEY (idClient) REFERENCES users(idUser)
 );
 
@@ -86,7 +93,7 @@ CREATE TABLE activation(
     idrole int,
     FOREIGN key(idrole) REFERENCES roles(idrole)
 );
--- chauffeur details vue
+-- chauffeur details vue;
 create or replace view v_chauffeurs as select u.idUser, u.nom, prenom, phone, email, m.nom marque, modele, plaque, prix from users u join chauffeurs on u.idUser = chauffeurs.iduser join marque m on m.idmarque = chauffeurs.idmarque;
 
 select *, (st_distance(st_setsrid(st_makepoint(47.5332608, -18.9136896), 4326)::geography, st_setsrid(st_makepoint(47.5582392, -18.8754385), 4326)::geography)) as distStart, (st_distance(st_setsrid(st_makepoint(47.5422745, -18.9793256), 4326)::geography, st_setsrid(st_makepoint(47.5582392, -18.8754385), 4326)::geography)) as distPath from v_chauffeurs where iduser=1 order by distStart;

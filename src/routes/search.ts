@@ -1,5 +1,5 @@
 import express from "express"
-import { io } from ".."
+import { io } from "../.."
 import CustomWebSocket from "../models/SocketClients"
 import Driver from "../models/Driver"
 import ServerSocket from "../models/ServerSocket"
@@ -11,11 +11,11 @@ const search = express.Router()
 
 search.post('/', async (req, res) => {
     let { start, destination, min } = req.body
-    console.log('place ');
-    // console.log(start, destination);
-    console.log(min);
-    console.log(start);
-    console.log(destination);
+    //console.log('place ');
+    // //console.log(start, destination);
+    //console.log(min);
+    //console.log(start);
+    //console.log(destination);
     
     
     let driverDispo :any[] = []
@@ -27,14 +27,14 @@ search.post('/', async (req, res) => {
     for(let socket of clients) {
         socket.on('disponible', (arg) => {
             driverDispo.push(arg)
-            console.log(arg)
+            //console.log(arg)
         })
     }
 
     let connection = Connection.getConnection()
     let response :Driver[] = []
     let checkDistance = false;
-    console.log(driverDispo);
+    //console.log(driverDispo);
     
     setTimeout(async () => {
         let userTemp: Driver;
@@ -48,10 +48,10 @@ search.post('/', async (req, res) => {
             userTemp.lat = driver.lat
             userTemp.lng = driver.lng
             
-            console.log(userTemp)
+            //console.log(userTemp)
             checkDistance = await userTemp.setAttributeIfNear(start, destination, min, connection);
             if(checkDistance) {
-                console.log(userTemp);
+                //console.log(userTemp);
                 
                 response.push(userTemp);
             }
@@ -62,7 +62,7 @@ search.post('/', async (req, res) => {
         else {
             res.json(response)
         }
-    }, 5000);
+    }, 10000);
 })
 
 export default search

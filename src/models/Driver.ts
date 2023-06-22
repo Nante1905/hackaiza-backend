@@ -98,7 +98,7 @@ class Driver {
     }
 
     public static async findDriverById(id :number, connection: Sequelize) {
-        let query = `select * from v_chauffeurs where idDriver=${id}`
+        let query = `select * from v_chauffeurs where iduser=${id}`
         let [results, metadata] :any = await connection.query(query)
 
         let driver = new Driver()
@@ -113,25 +113,25 @@ class Driver {
         driver.prix = results[0].prix
 
 
-        console.log(results)
+        //console.log(results)
 
         return driver
     }
     
     public setAttributeIfNear = async (start: Place, destination: Place, min: number, connection: Sequelize) => {
-        console.log('localisation ' + this.lng + ' ' + this.lat);
+        //console.log('localisation ' + this.lng + ' ' + this.lat);
         let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326)::geography, st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)::geography))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326)::geography, st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)::geography))/1000 as distPath from v_chauffeurs where iduser=${this.id} order by distStart;`
 
 
-        console.log('execute query');
+        //console.log('execute query');
         
         let [results, metadata] :any = await connection.query(query)
         
-        console.log(results)
+        //console.log(results)
 
         if(results.length > 0) {
-            console.log('startDist ' + results[0].diststart);
-            console.log('path ' + results[0].distpath);
+            //console.log('startDist ' + results[0].diststart);
+            //console.log('path ' + results[0].distpath);
             
             if(results[0].diststart <= min) {
                 this.id = results[0].iduser

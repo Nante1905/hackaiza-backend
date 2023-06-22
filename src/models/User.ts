@@ -2,9 +2,10 @@ import { Connection } from "../connection/Connection"
 
 export class User {
     idUser :number
-    name :string
-    birthday: Date
-    telephone :string
+    nom :string
+    prenom :string
+    naissance: Date
+    phone :string
     email :string
     idRole :number
     password: string
@@ -22,15 +23,17 @@ export class User {
 
         try {
             let [results, metadata] :any = await connection.query(query)
-            console.log(results[0]);
+            //console.log(results[0]);
 
             if(results.length != 0) {
                 user = new User()
                 user.idUser = results[0].iduser
+                user.nom = results[0].nom
+                user.prenom = results[0].prenom
                 user.email = results[0].email
             }
         } catch(e) {
-            console.log(e)
+            //console.log(e)
         }
 
 
@@ -49,17 +52,17 @@ export class User {
                 user = new User()
                 user.idUser = results[0].iduser
                 user.idRole = results[0].idrole
-                console.log("ssssssssss ", results[0])
+                //console.log("ssssssssss ", results[0])
             }
         } catch(e) {
-            console.log(e)
+            //console.log(e)
         }
 
         return user
     }
 
     public static SignUpUser = async (body) => {
-        console.log(body)
+        //console.log(body)
         let { nom, prenom, naissance, email, phone, password, activation } = body
 
         let connection = Connection.getConnection();
@@ -85,13 +88,13 @@ export class User {
             return true
         } 
         catch (e) {
-            console.log("Exception sur signup user " + e);
+            //console.log("Exception sur signup user " + e);
             // throw e;
         }
     }
 
     public static signDriver = async (body) => {
-        console.log(body)
+        //console.log(body)
 
         let { nom, prenom, naissance, email, phone, password, idMarque, model, plaque, prix, activation } = body
 
@@ -118,7 +121,7 @@ export class User {
         try {
             let [results, ] :any = await connection.query(queryuser, { transaction: t })
 
-            console.log('result => ', results)
+            //console.log('result => ', results)
 
             await connection.query(driverQuery, {
                 transaction: t,
@@ -129,8 +132,19 @@ export class User {
             t.commit()
         } catch(e) {
             t.rollback()
-            console.log(e)
+            //console.log(e)
         }
         
+    }
+
+    public static async getNotificationToken(id) :Promise<string> {
+        let query = `select * from users where iduser=${id}`
+        let sequelize = Connection.getConnection()
+        try {
+            let [result, ] :any = await sequelize.query(query)
+            return result[0].token
+        } catch(e) {
+            console.log(e)
+        }
     }
 }
