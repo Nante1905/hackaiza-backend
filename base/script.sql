@@ -19,6 +19,9 @@ CREATE TABLE users(
     FOREIGN key(idrole) REFERENCES roles(idrole)
 );
 
+INSERT INTO users 
+VALUES(DEFAULT, 'Rabe', 'RANDRIAMAMONJY', '12-05-1996', 'rabe@gmail.com','0348712356', 'azerty' , 2, 'azerty');
+
 CREATE TABLE marque(
     idMarque SERIAL NOT NULL PRIMARY KEY,
     nom VARCHAR(25)
@@ -34,6 +37,8 @@ CREATE TABLE chauffeurs(
     FOREIGN KEY (idUser) REFERENCES users(idUser),
     FOREIGN KEY (idMarque) REFERENCES marque(idMarque)
 );
+INSERT INTO chauffeurs values
+(default, 1, 1, 'test', 'test', 1000);
 
 CREATE TABLE chat(
     idChat SERIAL PRIMARY KEY,
@@ -93,7 +98,12 @@ CREATE TABLE activation(
     idrole int,
     FOREIGN key(idrole) REFERENCES roles(idrole)
 );
--- chauffeur details vue;
-create or replace view v_chauffeurs as select u.idUser, u.nom, prenom, phone, email, m.nom marque, modele, plaque, prix from users u join chauffeurs on u.idUser = chauffeurs.iduser join marque m on m.idmarque = chauffeurs.idmarque;
 
-select *, (st_distance(st_setsrid(st_makepoint(47.5332608, -18.9136896), 4326)::geography, st_setsrid(st_makepoint(47.5582392, -18.8754385), 4326)::geography)) as distStart, (st_distance(st_setsrid(st_makepoint(47.5422745, -18.9793256), 4326)::geography, st_setsrid(st_makepoint(47.5582392, -18.8754385), 4326)::geography)) as distPath from v_chauffeurs where iduser=1 order by distStart;
+
+
+insert into courses values(default, 1, 1, ST_GeomFromText('POINT(-122.4194 37.7749)'), ST_GeomFromText('POINT(-122.4194 37.7749)'), '2023-06-11', 1, 3000, 4, 5, 4, 5, 'azerty', 'qwerty');
+insert into courses values(default, 1, 1, ST_GeomFromText('POINT(-122.4194 37.7749)'), ST_GeomFromText('POINT(-122.4194 37.7749)'), '2023-06-18', 1, 3000, 4, 5, 4, 5, 'azerty', 'qwerty');
+
+SELECT COUNT(status) FROM courses WHERE status = 1 AND EXTRACT(MONTH FROM dateCourse) = 6; 
+
+SELECT SUM(prix) FROM courses WHERE status = 1 AND EXTRACT(MONTH FROM dateCourse) = 6;

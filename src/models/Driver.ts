@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize"
+import { Connection } from "../connection/Connection"
 import Place from "./Place"
 import { User } from "./User"
 
@@ -150,7 +151,72 @@ class Driver {
         }
         return false;
 
+    }   
+
+
+    // status  = 1 ==> stat accepte status = 2 ==> stat refuse
+    public static async StatsCourses_Tous_les_Mois_dans_une_anne(id_chauffeur, anne, status) {
+
+        const query = `SELECT * from stat_chauffeur_anne(${id_chauffeur}, ${anne}, ${status})`
+        let sequelize = Connection.getConnection()
+
+        let [results, ] :any = await sequelize.query(query)
+        
+        let reponse = []
+        let tous_les_mois = ["Janvier","Fevrier","Mars","Avril","Mai","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Decembre"]
+
+        for (let result of results) {
+            reponse.push(
+                {
+                    mois : tous_les_mois[result.mois-1],
+                    nombre : result.nombre,
+                    prix : result.prix_total
+                }
+            )
+        }
+
+        for(let re of reponse) {
+            console.log(re)
+        }
+
+        return reponse
     }
+
+    // retourne les stats d'un chauffeur a une date donne d1 a (d1 + nb_jour)
+    // ilay date atao sous forme string azafady fa raha tsy zany tsy mandeha exemple 2023-06-11
+    // limiter ho 15 ny nombre de jour fa azo ovaina 
+    public static async StatsCourses_jours_intervalle(id_chauffeur, datedebut, nb_jour, status) {
+        // nb_jour = nb_jour - 1
+        if(nb_jour > 15 || nb_jour < 0) {
+            throw new Error("Nombre de jour Invalide")
+        }
+
+        const query = `SELECT * from stat_chauffeur_jour(${id_chauffeur},'${datedebut}'::date, ${nb_jour} ,${status})`
+        let sequelize = Connection.getConnection()
+
+        let [results, ] :any = await sequelize.query(query)
+        
+        let reponse = []
+
+        for (let result of results) {
+            reponse.push(
+                {
+                    date : result.date_genere,
+                    nombre : result.nombre,
+                    prix : result.prix_total
+                }
+            )
+        }
+
+        for(let re of reponse) {
+            console.log(re)
+        }
+
+        return reponse
+    }
+
+    
+
 }
 
 export default Driver
