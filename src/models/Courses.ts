@@ -60,7 +60,30 @@ export class Courses {
         let [results, metadata] :any = await connection.query(query)
 
         let listCourse: Courses[] = []
-        
-        
     }
+
+    public static async accept(id :number, idClient : number, connection: Sequelize) {
+        let query = `update courses set status = 1 where idCourse = ${id} and idClient = ${idClient}`;
+        let [results, metadata] :any = await connection.query(query)
+        try { 
+            let [results,] = await connection.query(query);
+            return true
+        } 
+        catch (e) {
+            console.log(e.message);
+        }
+    }
+
+    public static async refuse(id :number , idClient : number, connection: Sequelize) {
+        let query = `update courses set status = 0 where idCourse = ${id} and idClient = ${idClient}`;
+        let [results, metadata] :any = await connection.query(query)
+        try { 
+            let [results,] = await connection.query(query);
+            return true
+        } 
+        catch (e) {
+            console.log(e.message);
+        }
+    }
+
 }
