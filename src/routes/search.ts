@@ -27,7 +27,7 @@ search.post('/', async (req, res) => {
     for(let socket of clients) {
         socket.on('disponible', (arg) => {
             driverDispo.push(arg)
-            //console.log(arg)
+            console.log(arg)
         })
     }
 

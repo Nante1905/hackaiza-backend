@@ -37,6 +37,21 @@ class SocketClients {
             }
         }
     }
+    public static findDriver(id) {
+        for(let socket of SocketClients.drivers) {
+            if(socket.data.id == id) {
+                return socket
+            }
+        }
+    }
+
+    public static findClient(id) {
+        for(let socket of SocketClients.clients) {
+            if(socket.data.id == id) {
+                return socket
+            }
+        }
+    }
 }
 
 export default SocketClients

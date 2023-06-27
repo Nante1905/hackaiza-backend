@@ -1,4 +1,4 @@
-import express from "express"
+import express, { request } from "express"
 import { Connection } from "../connection/Connection"
 import Course from "../models/Course"
 import Driver from "../models/Driver"
@@ -6,6 +6,7 @@ import Place from "../models/Place"
 import SocketClients from "../models/SocketClients"
 import { User } from "../models/User"
 import admin from 'firebase-admin'
+import Chat from "../models/Chat"
 
 export const demande = express.Router()
 
@@ -30,6 +31,7 @@ demande.post('/ask', async (req, res) => {
         //console.log(depart)
         //console.log(course)
         course.save()
+
         for(let driver of SocketClients.getDrivers()) {
             if(driver.data.id == idChauffeur) {
                 driver.emit("course", "Misy couse ato zandry eh")
@@ -65,5 +67,45 @@ demande.get('/find/:id', async (req, res) => {
     } catch(e) {
         console.log(e)
         res.status(500).send()
+    }
+})
+
+demande.get('/client/find/:id', async (req, res) => {
+    try {
+        let courses = await Course.findByIdClient(req.params.id)
+        //console.log("course an i " + req.params.id, courses)
+
+        res.json(courses)
+    } catch(e) {
+        console.log(e)
+        res.status(500).send()
+    }
+})
+
+demande.get('/accept/:id', async (req, res) => {
+    let id = req.params.id
+
+    const connection = Connection.getConnection()
+    const transaction = await connection.transaction()
+    try {
+        let { idclient, idchauffeur } :any = await Course.accept(id, connection, transaction)
+        let idchat = await Chat.create(idclient, idchauffeur, id, connection, transaction)
+        transaction.commit()
+        let clientSocket = SocketClients.findClient(idclient)
+        console.log("driver accept", clientSocket.data.id)
+        clientSocket.emit('notif')
+        res.json({
+            "code": 1,
+            idchat
+        })
+    }
+    catch(e) {
+        console.log(e)
+        transaction.rollback()
+        res.status(500)
+    }
+    finally {
+        res.send()
+        connection.close()
     }
 })

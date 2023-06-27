@@ -37,7 +37,14 @@ CREATE TABLE chauffeurs(
 
 CREATE TABLE chat(
     idChat SERIAL PRIMARY KEY,
-    status INT
+    status INT,
+    idclient int,
+    idchauffeur int,
+    dateheurecreation timestamp,
+    idcourse int,
+    FOREIGN key(idclient) REFERENCES users(iduser),
+    FOREIGN key(idchauffeur) REFERENCES users(iduser),
+    FOREIGN key(idcourse) REFERENCES courses(idcourse)
 );
 
 CREATE TABLE messages(
@@ -56,7 +63,7 @@ CREATE TABLE courses(
     idClient INT,
     depart GEOGRAPHY,
     destination GEOGRAPHY,
-    dateCourse DATE,
+    dateCourse timestamp,
     status INT,
     prix DECIMAL,
     departlat numeric,
