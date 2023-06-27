@@ -12,6 +12,8 @@ import marque from "./src/routes/marque"
 import { demande } from "./src/routes/demande"
 import admin from 'firebase-admin'
 import * as serviceKey from './hackaiza-push-firebase-adminsdk-6t2ws-d4fdd6e171.json'
+import Course from "./src/models/Course"
+import Driver from "./src/models/Driver"
 
 require("dotenv").config()
 
@@ -42,6 +44,11 @@ app.use('/demande', demande)
 app.get('/test', async (req, res) => {
     res.status(200).send()
 })
+
+console.log('azerty');
+Driver.StatsCourses_Tous_les_Mois_dans_une_anne(1,2023,1)
+Driver.StatsCourses_jours_intervalle(1, "2023-06-11", 6, 1)
+
 
 
 
