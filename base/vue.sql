@@ -25,6 +25,11 @@ create or replace view stat_chauffeur_mois as
         group by idChauffeur, status, anne, mois;
 
 
+-- getComment
+create or replace view v_comment_user as
+    select users.nom, users.prenom, users.phone, commentaires.idChauffeur, commentaires.text from commentaires 
+        JOIN users 
+            ON commentaires.idClient = users.idUser;
 
 
 

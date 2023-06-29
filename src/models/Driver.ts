@@ -215,7 +215,79 @@ class Driver {
         return reponse
     }
 
+    public static async GetComment(idChauffeur) {
+        const query = `SELECT * from v_comment_user WHERE idChauffeur = ${idChauffeur}`
+
+        let sequelize = Connection.getConnection()
+
+        let [results, ] :any = await sequelize.query(query)
+
+        let reponse = []
+
+        for (let result of results) {
+            reponse.push(
+                {
+                    nomClient : result.nom,
+                    prenomClient : result.prenom,
+                    comment : result.text
+                }
+            )
+        }
+
+        for(let re of reponse) {
+            console.log(re)
+        }
+
+        return reponse
+
+    }
+
+    public static async GetNotes(idChauffeur) {
+
+        const query = `SELECT avg(valeur) as note FROM notes WHERE idChauffeur = ${idChauffeur}`
+
+        let sequelize = Connection.getConnection()
+
+        let [results, ] :any = await sequelize.query(query)
+
+        let reponse = results[0].note
+
+        return reponse
+
+    }
+
+    public static async InsertComment(idChauffeur, idClient, commentaire) {
+
+        const query = `INSERT INTO commentaires VALUES(default, ${idChauffeur}, ${idClient}, '${commentaire}', NOW())`
+
+        let sequelize = Connection.getConnection()
+
+        try {
+            sequelize.query(query)
+        } catch(e) {
+            throw e
+        } 
+        
+    }
     
+    public static async InsertNote(idChauffeur, valeur) {
+
+        if(valeur <= 0 || valeur > 5)
+        {
+            throw new Error("Note invalide!")
+        }
+
+        const query = `INSERT INTO notes VALUES(default, ${idChauffeur}, ${valeur})`
+
+        let sequelize = Connection.getConnection()
+
+        try {
+            sequelize.query(query)
+        } catch(e) {
+            throw e
+        } 
+
+    }
 
 }
 
