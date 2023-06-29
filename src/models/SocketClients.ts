@@ -6,48 +6,56 @@ class SocketClients {
 
 
     public static addClient(socket) {
-        this.clients.push(socket)
+        SocketClients.clients.push(socket)
     }
 
     public static addDriver(socket) {
-        this.drivers.push(socket)
+        SocketClients.drivers.push(socket)
     }
 
     public static getDrivers() {
-        return this.drivers
+        return SocketClients.drivers
     }
 
     public static getClients() {
-        return this.clients
+        return SocketClients.clients
     }
 
     public static deleteClient(client) {
-        for(let clientConn of this.clients) {
-            if(clientConn.data.id == client.data.id) {
-                let i = this.clients.indexOf(clientConn)
-                this.clients.splice(i, 1)
-            }
-        }
+        const newClients = SocketClients.clients.filter((socket) => (socket.data.id[0] !== client.data.id[0]))
+        SocketClients.clients = newClients
+        console.log("new clients", newClients, newClients.length)
+        // console.log(this.clients.map(cl => cl.id))
+        // for(let clientConn of this.clients) {
+        //     if(clientConn.data.id == client.data.id) {
+        //         let i = this.clients.indexOf(clientConn)
+        //         this.clients.splice(i, 1)
+        //     }
+        // }
     }
     public static deleteDriver(driver) {
-        for(let driverConn of this.drivers) {
-            if(driverConn.data.id == driver.data.id) {
-                let i = this.drivers.indexOf(driverConn)
-                this.drivers.splice(i, 1)
-            }
-        }
+        const newDrivers = SocketClients.drivers.filter((socket) => (socket.data.id[0] !== driver.data.id[0]))
+        SocketClients.drivers = newDrivers
+        console.log("new drivers",newDrivers, newDrivers.length)
+        // console.log(this.drivers.map(dr => dr.id))
+        // for(let driverConn of this.drivers) {
+        //     if(driverConn.data.id == driver.data.id) {
+        //         let i = this.drivers.indexOf(driverConn)
+        //         this.drivers.splice(i, 1)
+        //     }
+        // }
     }
-    public static findDriver(id) {
+    public static findDriver(id) :Socket {
         for(let socket of SocketClients.drivers) {
-            if(socket.data.id == id) {
+            if(socket.data.id[0] == id) {
                 return socket
             }
         }
     }
 
-    public static findClient(id) {
+    public static findClient(id) :Socket {
         for(let socket of SocketClients.clients) {
-            if(socket.data.id == id) {
+            if(socket.data.id[0] == id) {
                 return socket
             }
         }

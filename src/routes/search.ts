@@ -11,6 +11,7 @@ const search = express.Router()
 
 search.post('/', async (req, res) => {
     let { start, destination, min } = req.body
+    console.log(req.body)
     //console.log('place ');
     // //console.log(start, destination);
     //console.log(min);

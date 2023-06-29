@@ -57,7 +57,7 @@ CREATE TABLE messages(
     idChat INT,
     idExpedit INT,
     text TEXT,
-    dateEnvoie DATE,
+    dateEnvoie timestamp,
     FOREIGN KEY (idChat) REFERENCES chat(idChat),
     FOREIGN KEY (idExpedit) REFERENCES users(idUser)
 );
@@ -114,3 +114,10 @@ insert into courses values(default, 1, 1, ST_GeomFromText('POINT(-122.4194 37.77
 SELECT COUNT(status) FROM courses WHERE status = 1 AND EXTRACT(MONTH FROM dateCourse) = 6; 
 
 SELECT SUM(prix) FROM courses WHERE status = 1 AND EXTRACT(MONTH FROM dateCourse) = 6;
+
+
+create view v_last_dateenvoie as SELECT idchat, max(dateEnvoie) dateenvoie from messages group by idchat;
+
+create view v_last_message_per_chat as select m.* from messages m join v_last_dateenvoie ld on m.idChat = ld.idChat and m.dateEnvoie=ld.dateEnvoie;
+
+create view v_chat_last_message as select c.*, concat(u1.nom, ' ', u1.prenom) nomclient, concat(u2.nom, ' ', u2.prenom) nomchauffeur, lm.text message, lm.dateEnvoie from chat c left outer join v_last_message_per_chat lm on c.idchat=lm.idchat join users u1 on c.idclient=u1.iduser join users u2 on c.idchauffeur=u2.iduser;

@@ -14,6 +14,7 @@ import admin from 'firebase-admin'
 import * as serviceKey from './hackaiza-push-firebase-adminsdk-6t2ws-d4fdd6e171.json'
 import Course from "./src/models/Course"
 import Driver from "./src/models/Driver"
+import chat from "./src/routes/chat"
 
 require("dotenv").config()
 
@@ -41,13 +42,14 @@ app.use("/search", search)
 app.use('/signup', signup)
 app.use('/marques', marque)
 app.use('/demande', demande)
+app.use('/chat', chat)
 app.get('/test', async (req, res) => {
     res.status(200).send()
 })
 
-console.log('azerty');
-Driver.StatsCourses_Tous_les_Mois_dans_une_anne(1,2023,1)
-Driver.StatsCourses_jours_intervalle(1, "2023-06-11", 6, 1)
+// console.log('azerty');
+// Driver.StatsCourses_Tous_les_Mois_dans_une_anne(1,2023,1)
+// Driver.StatsCourses_jours_intervalle(1, "2023-06-11", 6, 1)
 
 
 
@@ -62,12 +64,14 @@ io.on("connection", (socket) => {
             if(user && user.idRole == 2) {
                 SocketClients.deleteDriver(socket)
                 SocketClients.addDriver(socket)
+                console.log(SocketClients.getDrivers().map((s) => s.data.id))
                 socket.join("drivers")
                 console.log("driver connected")
             }
             else if(user && user.idRole == 1) {
                 SocketClients.deleteClient(socket)
                 SocketClients.addClient(socket)
+                console.log(SocketClients.getClients().map((s) => s.data.id))
                 socket.join("clients")
                 console.log("client connected")
             }

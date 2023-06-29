@@ -5,13 +5,13 @@ import Driver from "../models/Driver"
 import Place from "../models/Place"
 import SocketClients from "../models/SocketClients"
 import { User } from "../models/User"
-import admin from 'firebase-admin'
+import admin, { messaging } from 'firebase-admin'
 import Chat from "../models/Chat"
 
 export const demande = express.Router()
 
 demande.post('/ask', async (req, res) => {
-    //console.log("demande de course", req.body)
+    console.log("demande de course", req.body)
 
     const sequelize = Connection.getConnection()
 
@@ -33,7 +33,7 @@ demande.post('/ask', async (req, res) => {
         course.save()
 
         for(let driver of SocketClients.getDrivers()) {
-            if(driver.data.id == idChauffeur) {
+            if(driver.data.id[0] == idChauffeur) {
                 driver.emit("course", "Misy couse ato zandry eh")
                 let messaging = admin.messaging()
                 let token = await User.getNotificationToken(idChauffeur)
@@ -46,6 +46,7 @@ demande.post('/ask', async (req, res) => {
                             body: `De ${depart.name} à ${destination.name}`
                         }
                     }).then((result) => console.log(result))
+                    .catch(err => console.log(err))
                 // }
                 console.log("demande envoye")
             }
@@ -89,11 +90,24 @@ demande.get('/accept/:id', async (req, res) => {
     const transaction = await connection.transaction()
     try {
         let { idclient, idchauffeur } :any = await Course.accept(id, connection, transaction)
+        const chauffeur = await Driver.findDriverById(idchauffeur, connection)
         let idchat = await Chat.create(idclient, idchauffeur, id, connection, transaction)
         transaction.commit()
         let clientSocket = SocketClients.findClient(idclient)
         console.log("driver accept", clientSocket.data.id)
         clientSocket.emit('notif')
+        const token = await User.getNotificationToken(idclient)
+        if(token != '' && token != undefined) {
+            const messaging = admin.messaging()
+            messaging.send({
+                token: token,
+                notification: {
+                    title: "Votre chauffeur est prêt",
+                    body: `Le chauffeur ${chauffeur.prenom} ${chauffeur.nom} a accepté votre demande. Vous pouvez maintenant discuter`
+                }
+            }).then((info) => console.log(info))
+            .catch(err => console.log(err))
+        }
         res.json({
             "code": 1,
             idchat
@@ -105,7 +119,45 @@ demande.get('/accept/:id', async (req, res) => {
         res.status(500)
     }
     finally {
-        res.send()
         connection.close()
+    }
+})
+
+demande.get('/refuse/:id', async (req, res) => {
+    const courseId = req.params.id
+    const conn = Connection.getConnection()
+    try {
+        let { idclient, idchauffeur } = await Course.refuse(courseId)
+        const token = await User.getNotificationToken(idclient)
+        const chauffeur = await Driver.findDriverById(idchauffeur, conn)
+        let clientSocket = SocketClients.findClient(idclient)
+        if(clientSocket) {
+            clientSocket.emit('notif')
+        }
+        if(token !== '' && token !== undefined) {
+            const messaging = admin.messaging()
+            messaging.send({
+                token: token,
+                notification: {
+                    title: "Demande refusée",
+                    body: `Le chauffeur ${chauffeur.prenom} ${chauffeur.nom} a accepté votre demande. Vous pouvez maintenant discuter`
+                }
+            })
+        }
+
+        res.json({
+            code: 1,
+            OK: true,
+            message: "Demande refusée"
+        })
+    } catch(e) {
+        res.json({
+            code: 0,
+            OK: false,
+            message: "Une erreur s'est produite"
+        })
+        console.log(e);
+    } finally {
+        conn.close()
     }
 })

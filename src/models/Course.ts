@@ -1,8 +1,8 @@
-import { Sequelize } from "sequelize"
+import { QueryTypes, Sequelize } from "sequelize"
 import { Connection } from "../connection/Connection"
 import Place from "./Place"
 
-// -1 creer 1 accepter 0 refuser
+// -1 creer 1 accepter 3 valider 0 refuser
 
 class Course {
     idcourse :number
@@ -53,7 +53,7 @@ class Course {
     }
 
     public static async findByIdChauffeur(id) { // courses pending pour le chauffeur => id
-        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.iduser join users u on c.idclient=u.iduser where idchauffeur=${id} and status=-1 and (extract(epoch from now() - c.datecourse)/3600) < 4`
+        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.iduser join users u on c.idclient=u.iduser where idchauffeur=${id} and (extract(epoch from now() - c.datecourse)/3600) < 4`
         let sequelize = Connection.getConnection()
         let courses :Course[] = []
 
@@ -76,7 +76,7 @@ class Course {
     }
 
     public static async findByIdClient(id) { // courses pending pour le chauffeur => id
-        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.iduser join users u on c.idclient=u.iduser where idclient=${id} and status>-1 and (extract(epoch from now() - c.datecourse)/3600) < 4`
+        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.iduser join users u on c.idclient=u.iduser where idclient=${id} and (extract(epoch from now() - c.datecourse)/3600) < 4`
         let sequelize = Connection.getConnection()
         let courses :Course[] = []
 
@@ -86,7 +86,7 @@ class Course {
             temp.idcourse = result.idcourse
             temp.idchauffeur = result.idchauffeur
             temp.idclient = result.idclient
-            temp.depart = temp.destination = new Place(result.nomdepart, result.departlng, result.departlat)
+            temp.depart = new Place(result.nomdepart, result.departlng, result.departlat)
             temp.destination = new Place(result.nomdestination, result.destinationlng, result.destinationlat)
             temp.date = result.datecourse
             temp.status = result.status
@@ -114,12 +114,27 @@ class Course {
             // connection.close()
         }
     }
-    public static refuse(idCourse) {
-        let query = `update courses set status=0 where idcourse=${idCourse}`
+
+    public static async validate(idCourse) {
+        const connection = Connection.getConnection()
+        let query = `update courses set status=3 where idcourse=${idCourse}`
+        // const connection = Connection.getConnection()
+        try {
+            await connection.query(query)
+        } catch(e) {
+            throw e
+        } finally {
+            connection.close()
+        }
+    }
+
+
+    public static async refuse(idCourse) {
+        let query = `update courses set status=0 where idcourse=${idCourse} returning idchauffeur, idclient`
         let connection = Connection.getConnection()
         try {
-            connection.query(query)
-
+            let [result] :any = await connection.query(query)
+            return result[0]
         } catch(e) {
             throw e
         } finally {
