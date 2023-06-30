@@ -1,8 +1,9 @@
 import { QueryTypes, Sequelize } from "sequelize"
 import { Connection } from "../connection/Connection"
+import Chat from "./Chat"
 import Place from "./Place"
 
-// -1 creer 1 accepter 3 valider 0 refuser
+// -1 creer, 0 refuser, 1 accepter, 3 valider
 
 class Course {
     idcourse :number
@@ -41,8 +42,10 @@ class Course {
     }
 
     public save() {
-        const query = `insert into courses values (default, ${this.idchauffeur}, ${this.idclient}, st_makepoint(${this.depart.lat}, ${this.depart.lng})::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng})::geography, now() at time zone 'gmt-3', -1, ((select prix from v_chauffeurs where iduser=${this.idchauffeur})*(select st_distance(st_makepoint(${this.depart.lat}, ${this.depart.lng}, 4326)::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng}, 4326)::geography)/1000)), ${this.depart.lat}, ${this.depart.lng}, ${this.destination.lat}, ${this.destination.lng}, '${this.depart.name}', '${this.destination.name}')`
-
+        // this.depart.name.replaceAll("'", "''")
+        // this.destination.name.replaceAll("'", "''")
+        const query = `insert into courses values (default, ${this.idchauffeur}, ${this.idclient}, st_makepoint(${this.depart.lat}, ${this.depart.lng})::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng})::geography, now() at time zone 'gmt-3', -1, ((select prix from v_chauffeurs where iduser=${this.idchauffeur})*(select st_distance(st_makepoint(${this.depart.lat}, ${this.depart.lng}, 4326)::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng}, 4326)::geography)/1000)), ${this.depart.lat}, ${this.depart.lng}, ${this.destination.lat}, ${this.destination.lng}, '${this.depart.name.replaceAll("'", "''")}', '${this.destination.name.replaceAll("'", "''")}')`
+        
         let sequelize = Connection.getConnection()
 
         try {
@@ -115,11 +118,13 @@ class Course {
         }
     }
 
-    public static async validate(idCourse) {
+    public static async validate(idchat) {
         const connection = Connection.getConnection()
-        let query = `update courses set status=3 where idcourse=${idCourse}`
         // const connection = Connection.getConnection()
         try {
+            let chatDetails = await Chat.find(idchat)
+            const idCourse = chatDetails.idcourse
+            let query = `update courses set status=3 where idcourse=${idCourse}`
             await connection.query(query)
         } catch(e) {
             throw e

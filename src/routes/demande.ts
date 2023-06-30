@@ -124,10 +124,12 @@ demande.get('/accept/:id', async (req, res) => {
 })
 
 demande.get('/refuse/:id', async (req, res) => {
-    const courseId = req.params.id
+    const idchat = req.params.id
     const conn = Connection.getConnection()
     try {
-        let { idclient, idchauffeur } = await Course.refuse(courseId)
+        const chat = await Chat.find(idchat)
+        await Chat.close(idchat)
+        let { idclient, idchauffeur } = await Course.refuse(chat.idcourse)
         const token = await User.getNotificationToken(idclient)
         const chauffeur = await Driver.findDriverById(idchauffeur, conn)
         let clientSocket = SocketClients.findClient(idclient)
@@ -159,5 +161,21 @@ demande.get('/refuse/:id', async (req, res) => {
         console.log(e);
     } finally {
         conn.close()
+    }
+})
+
+demande.get('/validate/:id', async (req, res) => {
+    const idcourse = req.params.id
+    try {
+        await Course.validate(idcourse)
+
+        res.json({
+            OK: true
+        })
+    } catch(e) {
+        console.log(e)
+        res.json({
+            OK: false
+        })
     }
 })

@@ -288,7 +288,114 @@ class Driver {
         } 
 
     }
+    
+    public static async StatsCourses_mois(id_chauffeur, mois, anne, status) {
+        
+        const query = `SELECT * from stat_chauffeur_tous_mois(${id_chauffeur},${mois}, ${anne} ,${status})`
+        console.log(query)
+        let sequelize = Connection.getConnection()
+        let reponse = []
 
+        try {
+            let [results, ] :any = await sequelize.query(query)
+
+            for (let result of results) {
+                reponse.push(
+                    {
+                        date : result.date_genere,
+                        nombre : result.nombre,
+                        prix : result.prix_total
+                    }
+                )
+            }
+
+            for(let re of reponse) {
+                console.log(re)
+            }
+        } catch (error) {
+            throw error   
+        }
+        return reponse
+    }
+
+    public static async currentStatsCoursesMois(id_chauffeur, status, mois :number, annee :number) {
+        let query = ""
+        if(mois === undefined || annee === undefined) {
+            query = `SELECT * from stat_chauffeur_tous_mois(${id_chauffeur}, date_part('month', now() at time zone 'gmt-3')::integer, date_part('year', now() at time zone 'gmt-3')::integer ,${status})`
+        } else {
+            query = `SELECT * from stat_chauffeur_tous_mois(${id_chauffeur}, ${mois}, ${annee} ,${status})`
+        }
+        
+        let sequelize = Connection.getConnection()
+        let reponse = []
+
+        try {
+            let [results, ] :any = await sequelize.query(query)
+
+            for (let result of results) {
+                reponse.push(
+                    {
+                        date : result.date_genere,
+                        nombre : result.nombre,
+                        prix : parseFloat(result.prix_total)
+                    }
+                )
+            }
+      
+            return reponse
+        } catch (error) {
+            throw error   
+        } finally {
+            sequelize.close()
+        }
+    }
+
+    public static async currentNbrCoursesMois(id_chauffeur, status, mois, annee) {
+        let query = ""
+        if(mois === undefined || annee === undefined) {
+            query = `SELECT sum(nombre) nombre from stat_chauffeur_tous_mois(${id_chauffeur}, date_part('month', now() at time zone 'gmt-3')::integer, date_part('year', now() at time zone 'gmt-3')::integer ,${status})`
+        }
+        else {
+            query = `SELECT sum(nombre) nombre from stat_chauffeur_tous_mois(${id_chauffeur}, ${mois}, ${annee} ,${status})`
+        }
+        let sequelize = Connection.getConnection()
+
+        try {
+            let [results, ] :any = await sequelize.query(query)
+
+            return parseFloat(results[0].nombre)
+        } catch (error) {
+            throw error
+        } finally {
+            sequelize.close()
+        }
+    }
+
+    public static async getMonthIncome(id_chauffeur, mois, annee) {
+        let query = ""
+        if(mois === undefined || annee === undefined) {
+            query = `SELECT sum(prix_total) prix from stat_chauffeur_tous_mois(${id_chauffeur}, date_part('month', now() at time zone 'gmt-3')::integer, date_part('year', now() at time zone 'gmt-3')::integer ,3)`
+        }
+        else {
+            query = `SELECT sum(prix_total) prix from stat_chauffeur_tous_mois(${id_chauffeur}, ${mois}, ${annee} ,3)`
+        }
+        let sequelize = Connection.getConnection()
+
+        try {
+            let [results, ] :any = await sequelize.query(query)
+            console.log('result ', results);
+   
+            return parseFloat(results[0].prix)
+        } catch (error) {
+            throw error
+        } finally {
+            sequelize.close()
+        }
+    }
+
+    getStat() {
+        
+    }
 }
 
 export default Driver

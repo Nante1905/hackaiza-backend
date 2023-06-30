@@ -1,0 +1,1 @@
+SELECT sum(prix_total) prix_total from stat_chauffeur_tous_mois(20, date_part('month', now() at time zone 'gmt-3')::integer, date_part('year', now() at time zone 'gmt-3')::integer ,3)

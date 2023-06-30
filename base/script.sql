@@ -87,7 +87,7 @@ CREATE TABLE commentaires(
     idClient INT,
     text TEXT,
     dateCom DATE,
-    FOREIGN KEY (idChauffeur) REFERENCES chauffeurs(idChauffeur),
+    FOREIGN KEY (idChauffeur) REFERENCES users(iduser),
     FOREIGN KEY (idClient) REFERENCES users(idUser)
 );
 
@@ -95,7 +95,7 @@ CREATE TABLE notes(
     idNote SERIAL PRIMARY KEY,
     idChauffeur INT,
     valeur INT,
-    FOREIGN KEY (idChauffeur) REFERENCES chauffeurs(idChauffeur)
+    FOREIGN KEY (idChauffeur) REFERENCES users(iduser)
 );
 
 CREATE TABLE activation(
@@ -121,3 +121,5 @@ create view v_last_dateenvoie as SELECT idchat, max(dateEnvoie) dateenvoie from 
 create view v_last_message_per_chat as select m.* from messages m join v_last_dateenvoie ld on m.idChat = ld.idChat and m.dateEnvoie=ld.dateEnvoie;
 
 create view v_chat_last_message as select c.*, concat(u1.nom, ' ', u1.prenom) nomclient, concat(u2.nom, ' ', u2.prenom) nomchauffeur, lm.text message, lm.dateEnvoie from chat c left outer join v_last_message_per_chat lm on c.idchat=lm.idchat join users u1 on c.idclient=u1.iduser join users u2 on c.idchauffeur=u2.iduser;
+
+create view v_chat_courses as select ch.*, c.status coursestatus, concat(u1.nom, ' ', u1.prenom) nomclient, concat(u2.nom, ' ', u2.prenom) nomchauffeur from courses c join chat ch on c.idcourse=ch.idcourse join users u1 on u1.iduser=ch.idclient join users u2 on u2.iduser=ch.idchauffeur;
