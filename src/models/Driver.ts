@@ -1,10 +1,12 @@
-import { Sequelize } from "sequelize"
+import { Sequelize, Transaction } from "sequelize"
 import { Connection } from "../connection/Connection"
+import Chat from "./Chat"
 import Place from "./Place"
 import { User } from "./User"
 
 class Driver {
     id :number
+    note: number
 
     private _nom: string
     public get nom(): string {
@@ -145,6 +147,7 @@ class Driver {
                 this.plaque = results[0].plaque
                 this.prix = results[0].prix*results[0].distpath
                 this.distance = results[0].diststart
+                this.note = await Driver.getNotes(this.id)
 
                 return true;
             }
@@ -220,29 +223,32 @@ class Driver {
 
         let sequelize = Connection.getConnection()
 
-        let [results, ] :any = await sequelize.query(query)
-
-        let reponse = []
-
-        for (let result of results) {
-            reponse.push(
-                {
-                    nomClient : result.nom,
-                    prenomClient : result.prenom,
-                    comment : result.text
-                }
-            )
+        try {
+            let [results, ] :any = await sequelize.query(query)
+    
+            let reponse = []
+    
+            for (let result of results) {
+                reponse.push(
+                    {
+                        nomClient : result.nom,
+                        prenomClient : result.prenom,
+                        comment : result.text,
+                        date: result.datecom
+                    }
+                )
+            }
+            return reponse
+            
+        } catch (error) {
+            throw error;
+        } finally {
+            sequelize.close()
         }
-
-        for(let re of reponse) {
-            console.log(re)
-        }
-
-        return reponse
 
     }
 
-    public static async GetNotes(idChauffeur) {
+    public static async getNotes(idChauffeur) {
 
         const query = `SELECT avg(valeur) as note FROM notes WHERE idChauffeur = ${idChauffeur}`
 
@@ -256,21 +262,50 @@ class Driver {
 
     }
 
-    public static async InsertComment(idChauffeur, idClient, commentaire) {
+    public static async insertAppreciation(idChat, commentaire, note) {
+        let transaction = null
+        let connection = null
+        try {
+            const chat = await Chat.find(idChat);
+            if(chat.coursestatus != 3) {
+                const idChauffeur = chat.idchauffeur;
+                const idClient = chat.idclient;
+                connection = Connection.getConnection();
+                transaction = await connection.transaction();
 
-        const query = `INSERT INTO commentaires VALUES(default, ${idChauffeur}, ${idClient}, '${commentaire}', NOW())`
+                this.insertComment(idChauffeur, idClient, commentaire, connection, transaction);
+                this.InsertNote(idChauffeur, note, connection, transaction);
+                transaction.commit();
+            }
+            throw new Error("Course pas encore validée");
+        } catch (error) {
+            if(transaction) {
+                transaction.rollback();
+            }
+            console.log(error);
+            throw error;
+        }
+        finally {
+            if(connection) {
+                connection.close();
+            }
+        }
 
-        let sequelize = Connection.getConnection()
+    }
+
+    public static async insertComment(idChauffeur, idClient, commentaire, connection: Sequelize, transaction: Transaction) {
+
+        const query = `INSERT INTO commentaires VALUES(default, ${idChauffeur}, ${idClient}, '${commentaire}', NOW() at time zone 'gmt-3')`
 
         try {
-            sequelize.query(query)
+            connection.query(query, { transaction: transaction })
         } catch(e) {
             throw e
         } 
         
     }
     
-    public static async InsertNote(idChauffeur, valeur) {
+    public static async InsertNote(idChauffeur, valeur, connection: Sequelize, transaction: Transaction) {
 
         if(valeur <= 0 || valeur > 5)
         {
@@ -279,10 +314,8 @@ class Driver {
 
         const query = `INSERT INTO notes VALUES(default, ${idChauffeur}, ${valeur})`
 
-        let sequelize = Connection.getConnection()
-
         try {
-            sequelize.query(query)
+            connection.query(query, { transaction: transaction })
         } catch(e) {
             throw e
         } 

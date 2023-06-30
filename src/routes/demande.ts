@@ -39,14 +39,16 @@ demande.post('/ask', async (req, res) => {
                 let token = await User.getNotificationToken(idChauffeur)
                 console.log(token)
                 // for(let userToken of tokens) {
-                    messaging.send({
-                        token: token,
-                        notification: {
-                            title: "Vous avez un client",
-                            body: `De ${depart.name} à ${destination.name}`
-                        }
-                    }).then((result) => console.log(result))
-                    .catch(err => console.log(err))
+                    if(token) {
+                        messaging.send({
+                            token: token,
+                            notification: {
+                                title: "Vous avez un client",
+                                body: `De ${depart.name} à ${destination.name}`
+                            }
+                        }).then((result) => console.log(result))
+                        .catch(err => console.log(err))
+                    }
                 // }
                 console.log("demande envoye")
             }
@@ -92,7 +94,6 @@ demande.get('/accept/:id', async (req, res) => {
         let { idclient, idchauffeur } :any = await Course.accept(id, connection, transaction)
         const chauffeur = await Driver.findDriverById(idchauffeur, connection)
         let idchat = await Chat.create(idclient, idchauffeur, id, connection, transaction)
-        transaction.commit()
         let clientSocket = SocketClients.findClient(idclient)
         console.log("driver accept", clientSocket.data.id)
         clientSocket.emit('notif')
@@ -108,6 +109,7 @@ demande.get('/accept/:id', async (req, res) => {
             }).then((info) => console.log(info))
             .catch(err => console.log(err))
         }
+        transaction.commit()
         res.json({
             "code": 1,
             idchat

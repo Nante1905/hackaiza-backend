@@ -56,7 +56,7 @@ class Course {
     }
 
     public static async findByIdChauffeur(id) { // courses pending pour le chauffeur => id
-        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.iduser join users u on c.idclient=u.iduser where idchauffeur=${id} and (extract(epoch from now() - c.datecourse)/3600) < 4`
+        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.iduser join users u on c.idclient=u.iduser where idchauffeur=${id} and (extract(epoch from now() - c.datecourse)/3600) < 4 order by c.datecourse desc`
         let sequelize = Connection.getConnection()
         let courses :Course[] = []
 

@@ -56,8 +56,9 @@ export class User {
             }
         } catch(e) {
             //console.log(e)
+            throw e;
         }
-
+        connection.close();
         return user
     }
 
