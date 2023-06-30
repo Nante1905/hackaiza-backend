@@ -42,7 +42,7 @@ class Chat {
     }
 
     public static async sendMessage(idchat, idexpedit, text) {
-        const query = `insert into messages values(default, ${idchat}, ${idexpedit}, '${text}', now() at time zone 'gmt-3')`
+        const query = `insert into messages values(default, ${idchat}, ${idexpedit}, '${text.replaceAll("'", "''")}', now() at time zone 'gmt-3')`
 
         const conn = Connection.getConnection()
         try {
@@ -86,7 +86,7 @@ class Chat {
     }
 
     public static async find(idchat) {
-        const query = `select * from v_chat_last_message where idchat=${idchat}`
+        const query = `select * from v_chat_courses where idchat=${idchat}`
         const connection = Connection.getConnection()
         try {
             const [result] :any = await connection.query(query)

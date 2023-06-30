@@ -154,7 +154,92 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- eto
 
+CREATE OR REPLACE FUNCTION get_all_dates_in_month(year integer, month integer)
+RETURNS TABLE (date_genere date)
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT generate_series(
+        DATE_TRUNC('MONTH', DATE(year || '-' || month || '-01')),
+        DATE_TRUNC('MONTH', DATE(year || '-' || month || '-01')) + INTERVAL '1 MONTH - 1 DAY',
+        '1 day'
+    )::date AS date_range;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_all_dates_in_month(2023, 6); 
+
+
+-- tous les stats dans un moi
+CREATE OR REPLACE FUNCTION stat_chauffeur_tous_mois_beta(id_chauffeur integer, _mois integer, _anne integer, _status integer)
+RETURNS table(
+    idChauffeur int,
+    date_genere date,
+    status int,
+    nombre int,
+    prix_total numeric
+) 
+AS $$
+DECLARE row_date RECORD;
+BEGIN
+    FOR row_date in select * from get_all_dates_in_month(_anne, _mois) LOOP
+        RETURN QUERY
+        select 
+        id_chauffeur,
+        row_date.date_genere,
+        _status,
+        (select 
+            stat_chauffeur.nombre::integer 
+            FROM stat_chauffeur
+                where 
+                stat_chauffeur.anne = EXTRACT(YEAR FROM row_date.date_genere)  
+                and stat_chauffeur.mois = EXTRACT(MONTH FROM row_date.date_genere)
+                and stat_chauffeur.jour = EXTRACT(DAY FROM row_date.date_genere)
+                and stat_chauffeur.idChauffeur = id_chauffeur
+                and stat_chauffeur.status = _status),
+        (select 
+            stat_chauffeur.prix_total::numeric 
+            FROM stat_chauffeur
+                where 
+                stat_chauffeur.anne = EXTRACT(YEAR FROM row_date.date_genere)  
+                and stat_chauffeur.mois = EXTRACT(MONTH FROM row_date.date_genere)
+                and stat_chauffeur.jour = EXTRACT(DAY FROM row_date.date_genere)
+                and stat_chauffeur.idChauffeur = id_chauffeur
+                and stat_chauffeur.status = _status);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+-- select * from stat_chauffeur_tous_mois(1, 6, 2023, 1);
+
+CREATE OR REPLACE FUNCTION stat_chauffeur_tous_mois(id_chauffeur integer, _mois integer, _anne integer, _status integer)
+RETURNS table(
+    idChauffeur int,
+    date_genere date,
+    status int,
+    nombre int,
+    prix_total numeric
+) 
+AS $$
+BEGIN
+    RETURN QUERY
+    select 
+        val.idChauffeur,
+        val.date_genere,
+        val.status,
+        case
+            when val.nombre is null then 0
+            else val.nombre 
+        end,
+        case
+            when val.prix_total is null then 0
+            else val.prix_total  
+        end
+        from stat_chauffeur_tous_mois_beta(id_chauffeur, _mois, _anne, _status) as val;
+END;
+$$ LANGUAGE plpgsql;
 
 select * from stat_chauffeur_jour_beta(1, '2023-06-11'::date,10, 1 );
 select * from stat_chauffeur_jour(1, '2023-06-11'::date,10, 1 );

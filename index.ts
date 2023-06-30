@@ -4,7 +4,6 @@ import express, { json, urlencoded } from "express"
 import auth from "./src/routes/auth"
 import SocketClients from "./src/models/SocketClients"
 import search from "./src/routes/search"
-import ServerSocket from "./src/models/ServerSocket"
 import { User } from "./src/models/User"
 import signup from "./src/routes/signup"
 import cors from "cors"
@@ -15,6 +14,7 @@ import * as serviceKey from './hackaiza-push-firebase-adminsdk-6t2ws-d4fdd6e171.
 import Course from "./src/models/Course"
 import Driver from "./src/models/Driver"
 import chat from "./src/routes/chat"
+import stat from "./src/routes/stat"
 
 require("dotenv").config()
 
@@ -31,8 +31,6 @@ const server = http.createServer(app)
 
 export const io = new Server(server)
 
-ServerSocket.getServerInstance(io)
-
 admin.initializeApp({
     credential: admin.credential.cert(serviceKey as admin.ServiceAccount)
 })
@@ -43,6 +41,7 @@ app.use('/signup', signup)
 app.use('/marques', marque)
 app.use('/demande', demande)
 app.use('/chat', chat)
+app.use('/stat', stat)
 app.get('/test', async (req, res) => {
     res.status(200).send()
 })

@@ -60,39 +60,46 @@ chat.get('/messages/:id', async (req, res) => {
 chat.post('/send/', async (req, res) => {
     const { idchat, idexpedit, text } = req.body
     try {
-        let result = await Chat.sendMessage(idchat, idexpedit, text)
-        let sendId
-        let driver = false
-        if(idexpedit == result.idchauffeur) {
-            sendId = result.idclient
-        } 
-        else if(idexpedit == result.idclient) {
-            sendId = result.idchauffeur
-            driver = true
+        let chat = await Chat.find(idchat)
+        if(chat.status == 1) {
+            let result = await Chat.sendMessage(idchat, idexpedit, text)
+            let sendId
+            let driver = false
+            if(idexpedit == result.idchauffeur) {
+                sendId = result.idclient
+            } 
+            else if(idexpedit == result.idclient) {
+                sendId = result.idchauffeur
+                driver = true
+            }
+            if(sendId) {
+                let socket :Socket
+                if(driver) {
+                    socket = SocketClients.findDriver(sendId)
+                }
+                else if(driver == false) {
+                    socket = SocketClients.findClient(sendId)
+                }
+    
+                if(socket) {
+                    socket.emit('message', {
+                        idexpedit,
+                        idchat,
+                        text
+                    })
+                }
+                console.log(socket.data)
+                console.log(socket.id)
+            }
+            res.json({
+                OK: true
+            })
+        } else {
+            res.json({
+                OK: false,
+                error: "Chat ferme"
+            })
         }
-
-        if(sendId) {
-            let socket :Socket
-            if(driver) {
-                socket = SocketClients.findDriver(sendId)
-            }
-            else if(driver == false) {
-                socket = SocketClients.findClient(sendId)
-            }
-
-            if(socket) {
-                socket.emit('message', {
-                    idexpedit,
-                    text
-                })
-            }
-            console.log(socket.data)
-            console.log(socket.id)
-        }
-
-        res.json({
-            OK: true
-        })
     } catch(e) {
         res.json({
             OK: false,

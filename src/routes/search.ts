@@ -1,8 +1,6 @@
 import express from "express"
 import { io } from "../.."
-import CustomWebSocket from "../models/SocketClients"
 import Driver from "../models/Driver"
-import ServerSocket from "../models/ServerSocket"
 import { User } from "../models/User"
 import SocketClients from "../models/SocketClients"
 import { Connection } from "../connection/Connection"
