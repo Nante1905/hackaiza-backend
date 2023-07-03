@@ -101,17 +101,17 @@ class Driver {
     }
 
     public static async findDriverById(id :number, connection: Sequelize) {
-        let query = `select * from v_chauffeurs where iduser=${id}`
+        let query = `select * from v_chauffeurs where idutilisateur=${id}`
         let [results, metadata] :any = await connection.query(query)
 
         let driver = new Driver()
-        driver.id = results[0].iduser
+        driver.id = results[0].idutilisateur
         driver.nom = results[0].nom
         driver.prenom = results[0].prenom
         driver.phone = results[0].phone
         driver.email = results[0].email
         driver.marque = results[0].marque
-        driver.modele = results[0].model
+        driver.modele = results[0].modele
         driver.plaque = results[0].plaque
         driver.prix = results[0].prix
 
@@ -123,7 +123,7 @@ class Driver {
     
     public setAttributeIfNear = async (start: Place, destination: Place, min: number, connection: Sequelize) => {
         //console.log('localisation ' + this.lng + ' ' + this.lat);
-        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326)::geography, st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)::geography))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326)::geography, st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)::geography))/1000 as distPath from v_chauffeurs where iduser=${this.id} order by distStart;`
+        let query = `select *, (st_distance(st_setsrid(st_makepoint(${ this.lng }, ${ this.lat }), 4326)::geography, st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)::geography))/1000 as distStart, (st_distance(st_setsrid(st_makepoint(${ destination.lng }, ${ destination.lat }), 4326)::geography, st_setsrid(st_makepoint(${ start.lng }, ${ start.lat }), 4326)::geography))/1000 as distPath from v_chauffeurs where idutilisateur=${this.id} order by distStart;`
 
 
         //console.log('execute query');
@@ -137,7 +137,7 @@ class Driver {
             //console.log('path ' + results[0].distpath);
             
             if(results[0].diststart <= min) {
-                this.id = results[0].iduser
+                this.id = results[0].idutilisateur
                 this.nom = results[0].nom
                 this.prenom = results[0].prenom
                 this.phone = results[0].phone
@@ -219,7 +219,7 @@ class Driver {
     }
 
     public static async GetComment(idChauffeur) {
-        const query = `SELECT * from v_comment_user WHERE idChauffeur = ${idChauffeur}`
+        const query = `SELECT * from v_commentaires_utilisateur WHERE idChauffeur = ${idChauffeur}`
 
         let sequelize = Connection.getConnection()
 
@@ -267,17 +267,19 @@ class Driver {
         let connection = null
         try {
             const chat = await Chat.find(idChat);
-            if(chat.coursestatus != 3) {
+            if(chat.coursestatus == 3) {
                 const idChauffeur = chat.idchauffeur;
                 const idClient = chat.idclient;
                 connection = Connection.getConnection();
                 transaction = await connection.transaction();
 
-                this.insertComment(idChauffeur, idClient, commentaire, connection, transaction);
-                this.InsertNote(idChauffeur, note, connection, transaction);
-                transaction.commit();
+                await this.insertComment(idChauffeur, idClient, commentaire, connection, transaction);
+                await this.InsertNote(idChauffeur, note, connection, transaction);
             }
-            throw new Error("Course pas encore validée");
+            else {
+                throw new Error("Course pas encore validée");
+            }
+            transaction.commit();
         } catch (error) {
             if(transaction) {
                 transaction.rollback();
@@ -298,7 +300,7 @@ class Driver {
         const query = `INSERT INTO commentaires VALUES(default, ${idChauffeur}, ${idClient}, '${commentaire}', NOW() at time zone 'gmt-3')`
 
         try {
-            connection.query(query, { transaction: transaction })
+            await connection.query(query, { transaction: transaction })
         } catch(e) {
             throw e
         } 
@@ -307,7 +309,7 @@ class Driver {
     
     public static async InsertNote(idChauffeur, valeur, connection: Sequelize, transaction: Transaction) {
 
-        if(valeur <= 0 || valeur > 5)
+        if(valeur < 0 || valeur > 5)
         {
             throw new Error("Note invalide!")
         }
@@ -315,7 +317,7 @@ class Driver {
         const query = `INSERT INTO notes VALUES(default, ${idChauffeur}, ${valeur})`
 
         try {
-            connection.query(query, { transaction: transaction })
+            await connection.query(query, { transaction: transaction })
         } catch(e) {
             throw e
         } 
@@ -426,8 +428,19 @@ class Driver {
         }
     }
 
-    getStat() {
-        
+    public static async getNbrRate(iddriver) {
+        const connection = Connection.getConnection()
+        const query = `select count(*) avis from notes where valeur>0 and idchauffeur=${iddriver}`
+        try {
+            const [result] :any = await connection.query(query)
+
+            return result[0].avis
+        }
+        catch(e) {
+            throw e
+        } finally {
+            connection.close()
+        }
     }
 }
 

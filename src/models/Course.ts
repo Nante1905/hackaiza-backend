@@ -44,7 +44,7 @@ class Course {
     public save() {
         // this.depart.name.replaceAll("'", "''")
         // this.destination.name.replaceAll("'", "''")
-        const query = `insert into courses values (default, ${this.idchauffeur}, ${this.idclient}, st_makepoint(${this.depart.lat}, ${this.depart.lng})::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng})::geography, now() at time zone 'gmt-3', -1, ((select prix from v_chauffeurs where iduser=${this.idchauffeur})*(select st_distance(st_makepoint(${this.depart.lat}, ${this.depart.lng}, 4326)::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng}, 4326)::geography)/1000)), ${this.depart.lat}, ${this.depart.lng}, ${this.destination.lat}, ${this.destination.lng}, '${this.depart.name.replaceAll("'", "''")}', '${this.destination.name.replaceAll("'", "''")}')`
+        const query = `insert into courses values (default, ${this.idchauffeur}, ${this.idclient}, st_makepoint(${this.depart.lat}, ${this.depart.lng})::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng})::geography, now() at time zone 'gmt-3', -1, ((select prix from v_chauffeurs where idutilisateur=${this.idchauffeur})*(select st_distance(st_makepoint(${this.depart.lat}, ${this.depart.lng}, 4326)::geography, st_makepoint(${this.destination.lat}, ${this.destination.lng}, 4326)::geography)/1000)), ${this.depart.lat}, ${this.depart.lng}, ${this.destination.lat}, ${this.destination.lng}, '${this.depart.name.replaceAll("'", "''")}', '${this.destination.name.replaceAll("'", "''")}')`
         
         let sequelize = Connection.getConnection()
 
@@ -56,7 +56,7 @@ class Course {
     }
 
     public static async findByIdChauffeur(id) { // courses pending pour le chauffeur => id
-        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.iduser join users u on c.idclient=u.iduser where idchauffeur=${id} and (extract(epoch from now() - c.datecourse)/3600) < 4 order by c.datecourse desc`
+        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.idutilisateur join utilisateurs u on c.idclient=u.idutilisateur where idchauffeur=${id} and (extract(epoch from now() - c.datecourse)/3600) < 4 order by c.datecourse desc`
         let sequelize = Connection.getConnection()
         let courses :Course[] = []
 
@@ -79,7 +79,7 @@ class Course {
     }
 
     public static async findByIdClient(id) { // courses pending pour le chauffeur => id
-        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.iduser join users u on c.idclient=u.iduser where idclient=${id} and (extract(epoch from now() - c.datecourse)/3600) < 4`
+        const query = `select c.*, ch.nom nomchauffeur, u.nom nomclient from courses c join v_chauffeurs ch on c.idchauffeur=ch.idutilisateur join utilisateurs u on c.idclient=u.idutilisateur where idclient=${id} and (extract(epoch from now() - c.datecourse)/3600) < 4`
         let sequelize = Connection.getConnection()
         let courses :Course[] = []
 

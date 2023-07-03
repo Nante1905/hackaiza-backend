@@ -60,7 +60,7 @@ class Chat {
     }
 
     public static async findByIdUser(iduser :number) {
-        const query = `select * from v_chat_last_message where (idclient=${iduser} or idchauffeur=${iduser}) and status=1 order by dateenvoie`
+        const query = `select * from v_chat_dernier_message where (idclient=${iduser} or idchauffeur=${iduser}) and status=1 order by dateenvoie`
         const connection = Connection.getConnection()
         try {
             let [results, ] = await connection.query(query)

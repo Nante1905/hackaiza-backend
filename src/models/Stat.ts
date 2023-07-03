@@ -10,10 +10,10 @@ class Stat {
     }
 
     public static getVariation(n1: number, n2: number) {
-        if(n2 == 0) {
-            return -100;
+        if(n1 == 0) {
+            return 100;
         }
-        return ((n2-n1)/n2)*100;
+        return ((n2-n1)/n1)*100;
     }
 }
 

@@ -131,7 +131,7 @@ demande.get('/refuse/:id', async (req, res) => {
     try {
         const chat = await Chat.find(idchat)
         await Chat.close(idchat)
-        let { idclient, idchauffeur } = await Course.refuse(chat.idcourse)
+        let { idclient, idchauffeur } = await Course.refuse(chat ? chat.idcourse : idchat)
         const token = await User.getNotificationToken(idclient)
         const chauffeur = await Driver.findDriverById(idchauffeur, conn)
         let clientSocket = SocketClients.findClient(idclient)
@@ -144,7 +144,7 @@ demande.get('/refuse/:id', async (req, res) => {
                 token: token,
                 notification: {
                     title: "Demande refusée",
-                    body: `Le chauffeur ${chauffeur.prenom} ${chauffeur.nom} a accepté votre demande. Vous pouvez maintenant discuter`
+                    body: `Le chauffeur ${chauffeur.prenom} ${chauffeur.nom} a refusé votre demande. Vous pouvez maintenant discuter`
                 }
             })
         }

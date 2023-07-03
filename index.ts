@@ -15,6 +15,8 @@ import Course from "./src/models/Course"
 import Driver from "./src/models/Driver"
 import chat from "./src/routes/chat"
 import stat from "./src/routes/stat"
+import user from "./src/routes/user"
+import note from "./src/routes/note"
 
 require("dotenv").config()
 
@@ -42,6 +44,8 @@ app.use('/marques', marque)
 app.use('/demande', demande)
 app.use('/chat', chat)
 app.use('/stat', stat)
+app.use('/user', user)
+app.use('/rating', note)
 app.get('/test', async (req, res) => {
     res.status(200).send()
 })
@@ -58,7 +62,12 @@ io.on("connection", (socket) => {
         console.log('idSocket ' , id)
         if(id) {
             socket.data.id = id
-            let user = await User.findUserById(id)
+            let user
+            try {
+                user = await User.findUserById(id)
+            } catch(e) {
+                console.log(e)
+            }
             console.log(user)
             if(user && user.idRole == 2) {
                 SocketClients.deleteDriver(socket)

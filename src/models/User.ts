@@ -18,7 +18,7 @@ export class User {
 
     public static findWithUserAndPass = async (email, pass, role) => {
         let connection = Connection.getConnection()
-        let query = `select * from users where (email='${email}' or phone='${email}') and pass=md5('${pass}') and idrole=${role}`
+        let query = `select * from utilisateurs where (email='${email}' or phone='${email}') and pass=md5('${pass}') and idrole=${role}`
         let user :User = null
 
         try {
@@ -27,7 +27,7 @@ export class User {
 
             if(results.length != 0) {
                 user = new User()
-                user.idUser = results[0].iduser
+                user.idUser = results[0].idutilisateur
                 user.nom = results[0].nom
                 user.prenom = results[0].prenom
                 user.email = results[0].email
@@ -42,7 +42,7 @@ export class User {
 
     public static findUserById = async (id :number) => {
         let connection = Connection.getConnection()
-        let query = `select * from users where idUser=${id}`
+        let query = `select * from utilisateurs where idutilisateur=${id}`
 
         let user :User = null
         
@@ -50,8 +50,13 @@ export class User {
             let [results, metadata] :any = await connection.query(query)
             if(results) {
                 user = new User()
-                user.idUser = results[0].iduser
+                user.idUser = results[0].idutilisateur
                 user.idRole = results[0].idrole
+                user.nom = results[0].nom
+                user.prenom = results[0].prenom
+                user.naissance = results[0].datenaissance
+                user.phone = results[0].phone
+                user.email = results[0].email
                 //console.log("ssssssssss ", results[0])
             }
         } catch(e) {
@@ -81,7 +86,7 @@ export class User {
         }
 
         // Raha disponible le code
-        let query = `insert into users values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}'), 1)`;
+        let query = `insert into utilisateurs values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}'), 1)`;
 
         // let [results,] :any
         try { 
@@ -113,9 +118,15 @@ export class User {
             throw new Error('Date de naissance invalide')
         }
 
+        const plaquePattern = /^\d{4}[A-Za-z]{3}$/
+
+        if(!plaquePattern.test(plaque)) {
+            throw new Error('Plaque invalide')
+        }
+
         // Inserena ao am user sy chauffeur izy transactionnel
         const t = await connection.transaction()
-        let queryuser = `insert into users values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}'), 2) returning idUser`;
+        let queryuser = `insert into utilisateurs values (default, '${nom}', '${prenom}', '${naissance}', '${email}', '${phone}', md5('${password}'), 2) returning idutilisateur`;
 
         let driverQuery = `insert into chauffeurs values (default, :idUsers, ${idMarque}, '${model}', '${plaque}', ${prix})`
 
@@ -127,19 +138,19 @@ export class User {
             await connection.query(driverQuery, {
                 transaction: t,
                 replacements: {
-                    idUsers: results[0].iduser
+                    idUsers: results[0].idutilisateur
                 }
             })
             t.commit()
         } catch(e) {
             t.rollback()
-            //console.log(e)
+            throw e
         }
         
     }
 
     public static async getNotificationToken(id) :Promise<string> {
-        let query = `select * from users where iduser=${id}`
+        let query = `select * from utilisateurs where idutilisateur=${id}`
         let sequelize = Connection.getConnection()
         try {
             let [result, ] :any = await sequelize.query(query)

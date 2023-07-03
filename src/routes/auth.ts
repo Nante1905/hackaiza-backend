@@ -46,7 +46,7 @@ auth.post('/driver', async (req, res) => {
 auth.post('/register', async (req, res) => {
     console.log(req.body)
     let { token, id } = req.body
-    let query = `update users set token= '${token.value}' where iduser=${id}`
+    let query = `update utilisateurs set token= '${token.value}' where idutilisateur=${id}`
     let sequelize = Connection.getConnection()
     try {
         await sequelize.query(query)

@@ -1,11 +1,11 @@
 -- chauffeur details vue;
 create or replace view v_chauffeurs 
-    as select u.idUser, u.nom, prenom, phone, email, m.nom marque, modele, plaque, prix 
-    from users u 
-    join chauffeurs on u.idUser = chauffeurs.iduser 
+    as select u.idutilisateur, u.nom, prenom, phone, email, m.nom marque, modele, plaque, prix 
+    from utilisateurs u 
+    join chauffeurs on u.idutilisateur = chauffeurs.idutilisateur 
     join marque m on m.idmarque = chauffeurs.idmarque;
 
---select *, (st_distance(st_setsrid(st_makepoint(47.5332608, -18.9136896), 4326)::geography, st_setsrid(st_makepoint(47.5582392, -18.8754385), 4326)::geography)) as distStart, (st_distance(st_setsrid(st_makepoint(47.5422745, -18.9793256), 4326)::geography, st_setsrid(st_makepoint(47.5582392, -18.8754385), 4326)::geography)) as distPath from v_chauffeurs where iduser=1 order by distStart;
+--select *, (st_distance(st_setsrid(st_makepoint(47.5332608, -18.9136896), 4326)::geography, st_setsrid(st_makepoint(47.5582392, -18.8754385), 4326)::geography)) as distStart, (st_distance(st_setsrid(st_makepoint(47.5422745, -18.9793256), 4326)::geography, st_setsrid(st_makepoint(47.5582392, -18.8754385), 4326)::geography)) as distPath from v_chauffeurs where idutilisateur=1 order by distStart;
 
 -- stat chauffeur
 CREATE or replace view stat_chauffeur as
@@ -26,10 +26,11 @@ create or replace view stat_chauffeur_mois as
 
 
 -- getComment
-create or replace view v_comment_user as
-    select users.nom, users.prenom, users.phone, commentaires.idChauffeur, commentaires.text, datecom from commentaires 
-        JOIN users 
-            ON commentaires.idClient = users.idUser;
+create or replace view v_commentaires_utilisateur as
+    select utilisateurs.nom, utilisateurs.prenom, utilisateurs.phone, commentaires.idChauffeur, commentaires.text, datecom from commentaires 
+        JOIN utilisateurs 
+            ON commentaires.idClient = utilisateurs.idutilisateur
+    where commentaires.text != '';
 
 
 

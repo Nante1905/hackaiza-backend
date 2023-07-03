@@ -11,10 +11,12 @@ user.get('/driver/:id',async (req, res) => {
     try {
         const driver = await Driver.findDriverById(parseInt(id), connection);
         driver.note = await Driver.getNotes(parseInt(id));
+        const nbrRate = await Driver.getNbrRate(id)
 
         res.json({
             OK: true,
-            driver
+            driver,
+            avis: nbrRate
         })
     } catch (error) {
         console.log(error);
