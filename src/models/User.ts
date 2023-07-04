@@ -77,7 +77,7 @@ export class User {
         let activationQuery = `select * from activation where code='${activation}' and status='1'` // status = 1 midika oe avaliable le code
         let [activationResult,] = await connection.query(activationQuery)
         if(activationResult.length < 1) {
-            return null
+            throw new Error("Code d'activation invalide")
         }
 
         let naissanceDate :Date = new Date(naissance)
@@ -95,7 +95,7 @@ export class User {
         } 
         catch (e) {
             //console.log("Exception sur signup user " + e);
-            // throw e;
+            throw e;
         }
     }
 
@@ -122,6 +122,10 @@ export class User {
 
         if(!plaquePattern.test(plaque)) {
             throw new Error('Plaque invalide')
+        }
+
+        if(prix < 0) {
+            throw new Error('Le prix ne peut pas être négatif')
         }
 
         // Inserena ao am user sy chauffeur izy transactionnel

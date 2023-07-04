@@ -10,6 +10,12 @@ const search = express.Router()
 search.post('/', async (req, res) => {
     let { start, destination, min } = req.body
     console.log(req.body)
+
+    if(min as number < 0) {
+        res.status(500).json({
+            message: "La distance minimun ne peut pas être négative"
+        })
+    }
     //console.log('place ');
     // //console.log(start, destination);
     //console.log(min);
